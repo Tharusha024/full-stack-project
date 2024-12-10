@@ -39,10 +39,10 @@ function Employees() {
   return (
     <>
     <div className='absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200'>
-      <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Inactive Employees" arrow={<ArrowRightOutlined className='size-3'/>}/>
+      <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Employees" arrow={<ArrowRightOutlined className='size-3'/>}/>
     </div>
-    <div>
-      <div className="absolute left-[15%] top-28 pl-5 flex gap-5">
+    <div className='ml-5 absolute left-[15%] top-28 w-[85%]'>
+      <div className="left-[15%] top-28 flex gap-5">
         <Buttons_1
           name="Add Employee"
           bgColor="bg-custom-blue"
@@ -54,14 +54,15 @@ function Employees() {
       
       {activePopup === 'addEmployee' && <AddEmployeePopup onClose={closePopup} />}
      
-    </div>
-    <div className="absolute left-[15%] top-40 px-3 m-0 w-[85%] h-full bg-cyan-200">
+    
+    <div className="left-[15%] top-40 m-0 w-[95%] h-full bg-cyan-200">
     <div className='flex text-center gap-1 my-4'>
     <UserOutlined className='size-6'/>
-    <p className="text-base font-average ">Employee Table</p>
+    <p className="text-base font-average ">Employees List</p>
     <hr />
     </div>
     <Table headers={headers} rows={rows} actions={handleActions} />
+    </div>
     </div>
     </>
   )

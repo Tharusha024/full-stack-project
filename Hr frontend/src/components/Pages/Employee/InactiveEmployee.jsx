@@ -8,7 +8,7 @@ import AddEmployeePopup from './AddEmployeePopup';
 
 
 function InactiveEmployee() {
-  const headers = ["Pin", "Employee Name", "Email", "Contact", "User Type"];
+  const headers = ["Pin", "Employee Name", "Tai", "Contact", "User Type"];
   const rows = [
     { pin: "E001", name: "John Doe", email: "johndoe@example.com", contact: "+1234567890", userType: "Admin" },
     { pin: "E002", name: "Jane Smith", email: "janesmith@example.com", contact: "+9876543210", userType: "Manager" },
@@ -43,8 +43,8 @@ function InactiveEmployee() {
     <div className='absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200'>
       <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Inactive Employees" arrow={<ArrowRightOutlined className='size-3'/>}/>
     </div>
-    <div>
-      <div className="absolute left-[15%] top-28 pl-5 flex gap-5">
+    <div className='ml-5 absolute left-[15%] top-28 w-[85%]'>
+      <div className="flex gap-5">
         <Buttons_1
           name="Add Employee"
           bgColor="bg-custom-blue"
@@ -52,18 +52,16 @@ function InactiveEmployee() {
           onClick={handleAddEmployeeClick}
         />
       </div>
-
-      
       {activePopup === 'addEmployee' && <AddEmployeePopup onClose={closePopup} />}
      
-    </div>
-    <div className="absolute left-[15%] top-40 px-3 m-0 w-[85%] h-full bg-cyan-200">
+    
+    <div className="left-[15%] top-40  m-0 w-[95%] h-full bg-cyan-200">
     <div className='flex text-center gap-1 my-4'>
     <UserOutlined className='size-6'/>
-    <p className="text-base font-average ">Employee Table</p>
-    <hr />
+    <p className="text-base font-average ">Inactive Employees List</p>
     </div>
     <Table headers={headers} rows={rows} actions={handleActions} />
+    </div>
     </div>
     </>
   )
