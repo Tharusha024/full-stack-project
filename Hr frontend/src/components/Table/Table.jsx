@@ -1,0 +1,56 @@
+import React from "react";
+
+function Table({ headers, rows, actions }) {
+  return (
+    <table className="table-auto w-full border-collapse border border-gray-200">
+      <thead>
+        <tr className="bg-gray-100">
+          {headers.map((header, index) => (
+            <th
+              key={index}
+              className="border border-gray-300 px-4 py-2 text-left"
+            >
+              {header}
+            </th>
+          ))}
+          {actions && <th className="border border-gray-300 px-4 py-2 text-left">Action</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.length > 0 ? (
+          rows.map((row, rowIndex) => (
+            <tr
+              key={rowIndex}
+              className={`${rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100`}
+            >
+              {Object.values(row).map((value, cellIndex) => (
+                <td
+                  key={cellIndex}
+                  className="border border-gray-300 px-4 py-2"
+                >
+                  {value}
+                </td>
+              ))}
+              {actions && (
+                <td className="border border-gray-300 px-4 py-2 text-center flex space-x-2">
+                  {actions(row)}
+                </td>
+              )}
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td
+              className="border border-gray-300 px-4 py-2 text-center"
+              colSpan={headers.length + (actions ? 1 : 0)}
+            >
+              No Data Found
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+export default Table;
