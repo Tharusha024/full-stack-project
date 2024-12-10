@@ -1,7 +1,11 @@
-import { ArrowRightOutlined, DeleteOutlined, EditOutlined, UserOutlined } from '@ant-design/icons'
-import React from 'react'
+import { ArrowRightOutlined, DeleteOutlined, EditOutlined, MenuOutlined, PlusSquareOutlined, UserOutlined } from '@ant-design/icons'
+import React, { useState } from 'react'
 import SubTopBar from '../../TopBar/SubTopBar'
 import Table from '../../Table/Table';
+import Buttons_1 from '../../buttons/Buttons_1';
+import AddEmployeePopup from './AddEmployeePopup';
+
+
 
 function InactiveEmployee() {
   const headers = ["Pin", "Employee Name", "Email", "Contact", "User Type"];
@@ -25,10 +29,33 @@ function InactiveEmployee() {
       />
     </>
   );
+  const [activePopup, setActivePopup] = useState(null);
+
+  const handleAddEmployeeClick = () => {
+    setActivePopup('addEmployee');
+  };
+
+  const closePopup = () => {
+    setActivePopup(null);
+  };
   return (
     <>
-    <div className='absolute left-60 top-16 p-0 m-0 w-full h-full'>
+    <div className='absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200'>
       <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Inactive Employees" arrow={<ArrowRightOutlined className='size-3'/>}/>
+    </div>
+    <div>
+      <div className="absolute left-[15%] top-28 pl-5 flex gap-5">
+        <Buttons_1
+          name="Add Employee"
+          bgColor="bg-custom-blue"
+          icon={<PlusSquareOutlined />}
+          onClick={handleAddEmployeeClick}
+        />
+      </div>
+
+      
+      {activePopup === 'addEmployee' && <AddEmployeePopup onClose={closePopup} />}
+     
     </div>
     <div className="absolute left-[15%] top-40 px-3 m-0 w-[85%] h-full bg-cyan-200">
     <div className='flex text-center gap-1 my-4'>

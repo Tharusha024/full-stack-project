@@ -4,7 +4,7 @@ function Table({ headers, rows, actions }) {
   return (
     <table className="table-auto w-full border-collapse border border-gray-200">
       <thead>
-        <tr className="bg-gray-100">
+        <tr className="bg-custom-blue">
           {headers.map((header, index) => (
             <th
               key={index}
@@ -21,7 +21,7 @@ function Table({ headers, rows, actions }) {
           rows.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className={`${rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100`}
+              className={`${rowIndex % 2 === 0 ? "bg-custom-blue-2" : "bg-custom-blue-3"} hover:bg-gray-100`}
             >
               {Object.values(row).map((value, cellIndex) => (
                 <td

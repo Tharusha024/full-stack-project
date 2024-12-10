@@ -17,7 +17,10 @@ export default {
         'custom-pink':'#FF00A6',
         'custom-green':'#06B532',
         'custom-red':'#FF0000',
-        'custom-yellow':'#FBFF00'
+        'custom-yellow':'#FBFF00',
+        'custom-blue-2':'#B1ECFE',
+        'custom-blue-3':'#A6D2F5',
+        'custom-purple':'#AB01BA'
 
       }
     },
