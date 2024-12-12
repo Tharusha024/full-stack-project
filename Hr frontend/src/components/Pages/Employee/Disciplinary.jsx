@@ -54,8 +54,8 @@ function Disciplinary() {
       {activePopup === 'addEmployee' && <AddEmployeePopup onClose={closePopup} />}
      
     
-    <div className="left-[15%] top-40 w-[95%] h-full bg-cyan-200">
-    <div className='flex text-center gap-1 my-4'>
+    <div className="left-[15%] top-40 w-[95%] h-full bg-white p-3 mt-4">
+    <div className='flex text-center gap-1 mb-4'>
     <UserOutlined className='size-6'/>
     <p className="text-base font-average ">Disciplinary List</p>
     <hr />
