@@ -8,7 +8,7 @@ import AddEmployeePopup from './AddEmployeePopup';
 
 
 function InactiveEmployee() {
-  const headers = ["Pin", "Employee Name", "Tai", "Contact", "User Type"];
+  const headers = ["Pin", "Employee Name", "Email", "Contact", "User Type"];
   const rows = [
     { pin: "E001", name: "John Doe", email: "johndoe@example.com", contact: "+1234567890", userType: "Admin" },
     { pin: "E002", name: "Jane Smith", email: "janesmith@example.com", contact: "+9876543210", userType: "Manager" },
@@ -60,6 +60,7 @@ function InactiveEmployee() {
     <UserOutlined className='size-6'/>
     <p className="text-base font-average ">Inactive Employees List</p>
     </div>
+    <hr className="bg-black border-0 h-[3px] my-2" />
     <Table headers={headers} rows={rows} actions={handleActions} />
     </div>
     </div>

@@ -38,7 +38,7 @@ function Disciplinary() {
   return (
     <>
     <div className='absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200'>
-      <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Inactive Employees" arrow={<ArrowRightOutlined className='size-3'/>}/>
+      <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Disciplinary Employees" arrow={<ArrowRightOutlined className='size-3'/>}/>
     </div>
     <div className='ml-5 absolute left-[15%] top-28 w-[85%]'>
       <div className="left-[15%] top-28 flex gap-5">
@@ -49,17 +49,15 @@ function Disciplinary() {
           onClick={handleAddEmployeeClick}
         />
       </div>
-
-      
       {activePopup === 'addEmployee' && <AddEmployeePopup onClose={closePopup} />}
-     
-    
-    <div className="left-[15%] top-40 w-[95%] h-full bg-white p-3 mt-4">
-    <div className='flex text-center gap-1 mb-4'>
+
+
+    <div className="left-[15%] top-40 m-0 w-[95%] h-full bg-cyan-200">
+    <div className='flex text-center gap-1 my-4'>
     <UserOutlined className='size-6'/>
     <p className="text-base font-average ">Disciplinary List</p>
-    <hr />
     </div>
+    <hr className="bg-black border-0 h-[3px] my-2" />
     <Table headers={headers} rows={rows} actions={handleActions} />
     </div>
     </div>
