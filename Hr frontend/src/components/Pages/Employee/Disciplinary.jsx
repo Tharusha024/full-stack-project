@@ -11,6 +11,7 @@ function Disciplinary() {
     { pin: "E001", name: "John Doe", Title: "Titel_01", Description: "Description_01", Status: "Active" },
     { pin: "E002", name: "Jane Smith", Title: "Titel_01", Description: "Description_02", Status: "Active" },
     { pin: "E003", name: "Alice Johnson", Title: "Titel_01", Description: "Description_03", Status: "Active" },
+    { pin: "E003", name: "Alice Johnson", Title: "Titel_01", Description: "Description_03", Status: "Active" },
   ];
   const handleActions = (row) => (
     <>

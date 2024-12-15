@@ -4,7 +4,7 @@ import SubTopBar from '../../TopBar/SubTopBar'
 
 function Settings() {
   return (
-    <div className='absolute left-60 top-16 p-0 m-0 w-full h-full'>
+    <div className='absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200'>
       <SubTopBar icon={<SettingOutlined />} name="Settings"/>
     </div>
   )
