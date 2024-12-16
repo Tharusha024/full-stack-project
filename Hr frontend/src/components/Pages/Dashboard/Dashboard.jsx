@@ -5,6 +5,7 @@ import SubTopBar from '../../TopBar/SubTopBar'
 import DashboardCard from './DashboardCard'
 import { DashboardOutlined, DollarOutlined, FileExclamationOutlined, ProjectOutlined, UserOutlined } from '@ant-design/icons'
 import DashboardBox from './DashboardBox'
+import ToDoList from './ToDoList'
 
 
 const {Header} =Layout
@@ -24,6 +25,9 @@ function Dashboard() {
         <DashboardBox name="Pending leave Application" count="3" color="#06B532"/>
         <DashboardBox name="Upcoming Projects" count="5" color="#FF0000"/>
         <DashboardBox name="Loan Applications" count="3" color="#FBFF00"/>
+      </div>
+      <div>
+        <ToDoList />
       </div>
     </div>
     

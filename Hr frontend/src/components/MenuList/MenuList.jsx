@@ -34,7 +34,6 @@ function MenuList({ isSelected, setIsSelected }) {
         </Menu.SubMenu>
         <Menu.SubMenu className="font-menu" key="Attendance" icon={<CalendarOutlined />} title="Attendance">
         <Menu.Item className="submenuitem" key="AttendanceList" icon={<MinusSquareOutlined />} >Attendance List</Menu.Item>
-        <Menu.Item className="submenuitem" key="AddAttendance" icon={<MinusSquareOutlined />} >Add Attendance</Menu.Item>
         <Menu.Item className="submenuitem" key="AttendanceReport" icon={<MinusSquareOutlined />} >Attendance Report</Menu.Item>
         </Menu.SubMenu>
         <Menu.SubMenu className="font-menu" key="Leave" icon={<FileExclamationOutlined />} title="Leave">
