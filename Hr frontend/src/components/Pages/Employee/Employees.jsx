@@ -111,16 +111,7 @@ function Employees() {
             icon={<PlusSquareOutlined />}
             onClick={handleAddEmployeeClick}
           />
-          <select
-            className="border p-2"
-            value={userTypeFilter}
-            onChange={(e) => setUserTypeFilter(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="Admin">Admin</option>
-            <option value="Manager">Manager</option>
-            <option value="Staff">Staff</option>
-          </select>
+         
         </div>
 
         {activePopup === 'addEmployee' && (
