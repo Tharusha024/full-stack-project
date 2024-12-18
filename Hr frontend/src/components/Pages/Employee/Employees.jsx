@@ -80,7 +80,7 @@ function Employees() {
       <EditOutlined
         className="text-blue-500 cursor-pointer"
         title="Edit"
-        onClick={() => updateEmployee(row.id, { ...row, userType: "UpdatedType" })} // Example
+        onClick={() => updateEmployee(row.id, { ...row, userType: "UpdatedType" })} 
       />
       <DeleteOutlined
         className="text-red-500 cursor-pointer"

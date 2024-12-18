@@ -1,4 +1,4 @@
-import { useState } from 'react'
+
 import SideBar from './components/side_bar/SideBar'
 import TopBar from './components/TopBar/TopBar'
 
@@ -10,7 +10,7 @@ function App() {
     <TopBar />
    <SideBar />
    
-   <h1 className='font-menu'>qweqweqweqweerrereeeeeeeeeeeeee</h1>
+   
    </>
   )
 }
