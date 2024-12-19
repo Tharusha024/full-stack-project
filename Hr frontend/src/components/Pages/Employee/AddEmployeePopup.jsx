@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function AddEmployeePopup({ onClose }) {
@@ -7,7 +7,7 @@ function AddEmployeePopup({ onClose }) {
     pin: "",
     email: "",
     contact: "",
-    userType: "",
+    department: "", // Make sure this is initialized in the state
   });
 
   const handleChange = (e) => {
@@ -20,7 +20,7 @@ function AddEmployeePopup({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/employees", formData);
+      const response = await axios.post("http://localhost:8080/api/employee", formData);
       console.log("Employee added successfully:", response.data);
       alert("Employee added successfully!");
       onClose(); // Close the popup after successful submission
@@ -29,6 +29,32 @@ function AddEmployeePopup({ onClose }) {
       alert("Failed to add employee. Please try again.");
     }
   };
+
+  const [options, setOptions] = useState([]); // State to hold the dropdown options
+  const [loading, setLoading] = useState(true); // State to track loading state
+  const [error, setError] = useState(null); // State to track error if any
+
+  // Fetch data from API when the component mounts
+  useEffect(() => {
+    fetch('http://localhost:8081/api/department') // Replace with your API endpoint
+      .then(response => response.json())
+      .then(data => {
+        setOptions(data); // Set the dropdown options
+        setLoading(false); // Set loading to false after data is fetched
+      })
+      .catch(err => {
+        setError('Error fetching data');
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -47,7 +73,7 @@ function AddEmployeePopup({ onClose }) {
             />
           </div>
           <div className="mb-3">
-            <label className="block text-gray-700">Pin</label>
+            <label className="block text-gray-700">User ID</label>
             <input
               type="text"
               name="pin"
@@ -80,18 +106,20 @@ function AddEmployeePopup({ onClose }) {
             />
           </div>
           <div className="mb-3">
-            <label className="block text-gray-700">User Type</label>
+            <label className="block text-gray-700">Department</label>
             <select
               name="userType"
               value={formData.userType}
-              onChange={handleChange}
+              onChange={handleChange} // Handle change for userType
               className="w-full border p-2 rounded"
               required
             >
-              <option value="">Select</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Staff">Staff</option>
+              <option value="">Select User Type</option> {/* Default option */}
+              {options.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {option.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex justify-end gap-3 mt-4">

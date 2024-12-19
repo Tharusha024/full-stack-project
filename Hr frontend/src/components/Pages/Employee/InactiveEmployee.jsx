@@ -68,4 +68,4 @@ function InactiveEmployee() {
   )
 }
 
-export default InactiveEmployee
+export default InactiveEmployee;
