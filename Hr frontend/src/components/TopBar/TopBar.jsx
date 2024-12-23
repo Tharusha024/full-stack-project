@@ -1,5 +1,6 @@
 import { Layout } from 'antd'
 import React from 'react'
+import LogoutButton from '../Pages/LoggingPage/LogOutButton'
 
 
 const {Header} =Layout
@@ -12,6 +13,7 @@ function TopBar() {
             <h1 className='text-cyan-400 font-menu text-xl cursor-pointer'>SmartForce</h1>
             <div>
             <img src="UserPic.png" alt="" className='w-11 h-11 m-0 rounded-full cursor-pointer'/>
+            <LogoutButton />
             </div>
         </Header>
     </Layout>

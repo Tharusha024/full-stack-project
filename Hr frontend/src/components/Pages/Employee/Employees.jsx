@@ -55,15 +55,14 @@ function Employees() {
     }
   };
 
-  // Delete an employee
-  const deleteEmployee = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/employee/delete/${id}`);
-      fetchEmployees(); // Refresh the list
-    } catch (error) {
-      console.error("Error deleting employee:", error);
-    }
-  };
+const deleteEmployee = async (id) => {
+  try {
+    await axios.delete(`http://localhost:8080/api/employee/delete/${id}`);
+    fetchEmployees(); // Refresh the list
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+  }
+};
 
   // Change user type
   const changeUserType = async (id, newType) => {

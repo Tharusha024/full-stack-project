@@ -20,7 +20,8 @@ export default {
         'custom-yellow':'#FBFF00',
         'custom-blue-2':'#B1ECFE',
         'custom-blue-3':'#A6D2F5',
-        'custom-purple':'#AB01BA'
+        'custom-purple':'#AB01BA',
+        'custom-blue-4':'#00BED4'
 
       }
     },
