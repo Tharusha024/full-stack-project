@@ -14,9 +14,9 @@ function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600"
+      className="bg-red-500 text-white px-4 rounded-lg hover:bg-red-600 w-full h-[50px] flex justify-center items-center"
     >
-      <LogoutOutlined />
+      <LogoutOutlined /><p className='ml-3'>Log Out</p>
     </button>
   );
 }
