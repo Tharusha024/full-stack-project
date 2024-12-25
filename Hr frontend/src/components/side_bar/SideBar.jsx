@@ -16,8 +16,6 @@ import Projects from "../Pages/Project/Projects";
 import TaskList from "../Pages/Project/TaskList";
 import PayrollList from "../Pages/Payroll/PayrollList";
 import CheckPayroll from "../Pages/Payroll/CheckPayroll";
-import LoanList from "../Pages/Loan/LoanList";
-import LoanInstallment from "../Pages/Loan/LoanInstallment";
 import AssetsCategory from "../Pages/Assets/AssetsCategory";
 import AssetsList from "../Pages/Assets/AssetsList";
 import Notice from "../Pages/Notice/Notice";
@@ -26,9 +24,8 @@ import Settings from "../Pages/Settings/Settings";
 const { Sider } = Layout;
 
 function SideBar() {
-  const [isSelected, setIsSelected] = useState("Dashboard"); // State for selected menu
+  const [isSelected, setIsSelected] = useState("Dashboard");
 
-  // Render content dynamically based on the selected menu item
   const renderContent = () => {
     switch (isSelected) {
       case "Dashboard":
@@ -60,11 +57,7 @@ function SideBar() {
       case "PayrollList":
         return <PayrollList />; 
       case "CheckPayroll":
-        return <CheckPayroll />; 
-      case "LoanList":
-        return <LoanList />; 
-      case "LoanInstallment":
-        return <LoanInstallment />; 
+        return <CheckPayroll />;  
       case "AssetsCategory":
         return <AssetsCategory />; 
       case "AssetsList":

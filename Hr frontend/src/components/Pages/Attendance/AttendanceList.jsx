@@ -1,10 +1,9 @@
 import { ArrowRightOutlined, CalculatorOutlined, DeleteOutlined, EditOutlined, PlusSquareOutlined, UserOutlined } from '@ant-design/icons'
-import React, { useState } from 'react'
-import SubTopBar from '../../TopBar/SubTopBar'
-import Buttons_1 from '../../buttons/Buttons_1';
-
+import React, { useState } from 'react';
+import SubTopBar from '../../TopBar/SubTopBar';
 import Table from '../../Table/Table';
 import AddAttendance from './AddAttendance';
+import Buttons_1 from '../../Buttons/Buttons_1';
 
 function AttendanceList() {
   const headers = ["Pin", "Employee Name", "Date", "Sing In", "Sign Out","Working Hours"];

@@ -48,10 +48,6 @@ function MenuList({ isSelected, setIsSelected }) {
         <Menu.Item className="submenuitem" key="PayrollList" icon={<MinusSquareOutlined />} >Payroll List</Menu.Item>
         <Menu.Item className="submenuitem" key="CheckPayroll" icon={<MinusSquareOutlined />} >Check Payroll</Menu.Item>
         </Menu.SubMenu>
-        <Menu.SubMenu className="font-menu" key="Loan" icon={<FileDoneOutlined />} title="Loan">
-        <Menu.Item className="submenuitem" key="LoanList" icon={<MinusSquareOutlined />} >Loan List</Menu.Item>
-        <Menu.Item className="submenuitem" key="LoanInstallment" icon={<MinusSquareOutlined />} >Loan Installment</Menu.Item>
-        </Menu.SubMenu>
         <Menu.SubMenu className="font-menu" key="Assets" icon={<LaptopOutlined />} title="Assets">
         <Menu.Item className="submenuitem" key="AssetsCategory" icon={<MinusSquareOutlined />} >Assets Category</Menu.Item>
         <Menu.Item className="submenuitem" key="AssetsList" icon={<MinusSquareOutlined />} >Assets List</Menu.Item>
