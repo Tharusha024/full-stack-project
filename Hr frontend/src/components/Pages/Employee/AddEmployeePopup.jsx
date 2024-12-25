@@ -7,7 +7,7 @@ function AddEmployeePopup({ onClose }) {
     pin: "",
     email: "",
     contact: "",
-    department: "", // Make sure this is initialized in the state
+    department: "", 
   });
 
   const handleChange = (e) => {

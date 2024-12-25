@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import SubTopBar from '../../TopBar/SubTopBar';
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusSquareOutlined, UserOutlined } from '@ant-design/icons';
-import Buttons_1 from '../../buttons/Buttons_1';
+
 import AddEmployeePopup from './AddEmployeePopup';
 import Table from '../../Table/Table';
+import Buttons_1 from '../../Buttons/Buttons_1';
 
 function Employees() {
   const headers = ["Employee Name", "Pin", "Email", "User Type"];
