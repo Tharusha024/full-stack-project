@@ -53,7 +53,7 @@ function MenuList({ isSelected, setIsSelected }) {
         <Menu.Item className="submenuitem" key="AssetsList" icon={<MinusSquareOutlined />} >Assets List</Menu.Item>
         </Menu.SubMenu>
         <Menu.Item className="font-menu" key="Notice" icon={<NotificationOutlined />} >Notice</Menu.Item>
-        <Menu.Item className="font-menu" key="Settings" icon={<SettingOutlined />} >Setting</Menu.Item>
+      
         
     </Menu>
   )

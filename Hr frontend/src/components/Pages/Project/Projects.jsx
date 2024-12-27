@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import SubTopBar from '../../TopBar/SubTopBar';
 import Buttons_1 from '../../Buttons/Buttons_1';
 import AddProject from './AddProject';
+import ProjectFullTable from './ProjectFullTable';
 
 function Projects() {
   const [activePopup, setActivePopup] = useState(null);
@@ -14,6 +15,7 @@ function Projects() {
   const closePopup = () => {
     setActivePopup(null);
   };
+  
 
   return (
     <>
@@ -32,6 +34,15 @@ function Projects() {
         {activePopup === 'addProject' && (
           <AddProject onClose={closePopup} />
         )}
+        <div className="left-[15%] top-40 m-0 w-[95%] h-full bg-cyan-200">
+          <div className='flex text-center gap-1 my-4'>
+            <ProjectOutlined className='size-6' />
+            <p className="text-base font-average ">Project List</p>
+          </div>
+          <hr className="bg-black border-0 h-[3px] my-2" />
+          <ProjectFullTable />
+        </div>
+
       </div>
     </>
   );

@@ -1,49 +1,55 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-function AddProject({ onClose }) {  
-  const [formData, setFormData] = useState({
-    projectTitle: "",
-    startDate: "",
-    endDate: "",
-    details: "",
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-      alert('Start date must be before end date.');
-      return;
-    }
-    try {
-      const response = await axios.post("http://localhost:8080/api/employee", formData);
-      console.log("Project added successfully:", response.data);
-      alert("Project added successfully!");
-      onClose(); 
-    } catch (error) {
-      console.error("Error adding project:", error);
-      alert("Failed to add project. Please try again.");
-    }
-  };
-
+function AddNotice() {
+    const [formData, setFormData] = useState({
+        title: "",
+        file:"",
+        startDate: "",
+        details: "",
+      });
+    
+      const handleChange = (e) => {
+        setFormData({
+          ...formData,
+          [e.target.name]: e.target.value,
+        });
+      };
+    
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const response = await axios.post("http://localhost:8080/api/employee", formData);
+          console.log("Project added successfully:", response.data);
+          alert("Project added successfully!");
+          onClose(); 
+        } catch (error) {
+          console.error("Error adding project:", error);
+          alert("Failed to add project. Please try again.");
+        }
+      };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-cyan-200 p-6 rounded shadow-lg w-[400px]">
-        <h2 className="text-xl font-bold mb-4">Add New Project</h2>
+        <h2 className="text-xl font-bold mb-4">Add New Notice</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="block text-gray-700">Project Title</label>
+            <label className="block text-gray-700">Notice Title</label>
             <input
               type="text"
-              name="projectTitle"
-              value={formData.projectTitle}
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label className="block text-gray-700">Image File</label> 
+            <input
+              type="file"
+              name="file"
+              value={formData.file}
               onChange={handleChange}
               className="w-full border p-2 rounded"
               required
@@ -60,17 +66,7 @@ function AddProject({ onClose }) {
               required
             />
           </div>
-          <div className="mb-3">
-            <label className="block text-gray-700">End Date</label> 
-            <input
-              type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
+      
           <div className="mb-3">
             <label className="block text-gray-700">Project Details</label> 
             <textarea
@@ -93,13 +89,13 @@ function AddProject({ onClose }) {
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded"
             >
-              Add Project
+              Add Notice
             </button>
           </div>
         </form>
       </div>
     </div>
-  );
+  )
 }
 
-export default AddProject;
+export default AddNotice

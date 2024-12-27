@@ -34,7 +34,7 @@ function Table({ headers, rows, actions }) {
   return (
     <div>
       {/* Filter Input */}
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex ">
         <input
           type="text"
           placeholder="Filter by name/pin..."
