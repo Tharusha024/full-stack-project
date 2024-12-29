@@ -53,7 +53,6 @@ function NoticeTable() {
 
     const saveEdit = (updatedRow) => {
         console.log("Updated Row:", updatedRow);
-        // Here you would update the rows array or send the data to the backend
         closeEditPopup();
     };
 
