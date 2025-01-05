@@ -21,16 +21,15 @@ function AttendanceList() {
 
   const handleActions = (row) => (
     <>
-      <EditOutlined
-        className="text-blue-500 cursor-pointer"
-        title="Edit"
-        onClick={() => console.log("Edit", row)}
-      />
-      <DeleteOutlined
-        className="text-red-500 cursor-pointer"
-        title="Delete"
-        onClick={() => console.log("Delete", row)}
-      />
+      <button
+        className="bg-custom-blue text-white px-3 py-1 rounded"
+        onClick={() => openEditPopup(row)}>
+        <EditOutlined />
+        </button>
+        <button
+        className="bg-red-500 text-white px-3 py-1 rounded">
+        <DeleteOutlined />
+        </button>
     </>
   );
   const [activePopup, setActivePopup] = useState(null);

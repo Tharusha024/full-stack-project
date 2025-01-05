@@ -1,3 +1,4 @@
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 
 function Table({ headers, rows, actions }) {
@@ -107,9 +108,9 @@ function Table({ headers, rows, actions }) {
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+          className="bg-custom-blue px-3 py-1 rounded disabled:opacity-50"
         >
-          Previous
+          <ArrowLeftOutlined />
         </button>
         <span>
           Page {currentPage} of {totalPages}
@@ -117,9 +118,9 @@ function Table({ headers, rows, actions }) {
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+          className="bg-custom-blue px-3 py-1 rounded disabled:opacity-50"
         >
-          Next
+          <ArrowRightOutlined />
         </button>
       </div>
     </div>
