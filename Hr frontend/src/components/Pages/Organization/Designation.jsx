@@ -1,67 +1,265 @@
-import { ApartmentOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import React, { useState } from 'react'
-import SubTopBar from '../../TopBar/SubTopBar'
-import TableTwo from '../../Table/TableTwo';
-import AddOrganization from './AddOrganization';
+import React, { useState, useEffect } from 'react';
+import {
+  ApartmentOutlined,
+  ArrowRightOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SaveOutlined,
+  CloseSquareOutlined
+} from '@ant-design/icons';
+import axios from 'axios';
+import SubTopBar from '../../TopBar/SubTopBar';
 
 function Designation() {
-  const [departments, setDepartments] = useState([
-    {departmentName: "Software Engineer" },
-    {departmentName: "Software Engineer" } ,
-    {departmentName: "Software Engineer" } ,
-    {departmentName: "Software Engineer" } ,
-    {departmentName: "Software Engineer" },
-    {departmentName: "Software Engineer" } 
-  ]);
+  const [designationName, setDesignationName] = useState('');
+  const [basicSalary, setBasicSalary] = useState('');
+  const [designations, setDesignations] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editDesignationName, setEditDesignationName] = useState('');
+  const [editBasicSalary, setEditBasicSalary] = useState('');
+  const rowsPerPage = 5;
 
-  const headers = ["Department Name"];
+  useEffect(() => {
+    axios.get('http://localhost:8083/api/designation')
+      .then(response => {
+        setDesignations(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching designations:', error);
+      });
+  }, []);
 
-  const onEdit = (row) => {
-    console.log("Editing", row);
-    
-};
+  const handleSave = () => {
+    if (!designationName || !basicSalary) {
+      alert('Please fill out all fields.');
+      return;
+    }
 
-const onDelete = (row) => {
-    console.log("Deleting", row);
- 
-};
-  const handleActions = (row) => (
-    <div className="flex space-x-2">
-      <button
-        className="text-blue-500"
-        title="Edit"
-        onClick={() => onEdit(row)}
-      >
-        <EditOutlined />
-      </button>
-      <button
-        className="text-red-500"
-        title="Delete"
-        onClick={() => onDelete(row)}
-      >
-        <DeleteOutlined />
-      </button>
-    </div>
+    const data = {
+      designationName: designationName.trim(),
+      basicSalary: parseFloat(basicSalary)
+    };
+
+    axios.post('http://localhost:8083/api/designation', data)
+      .then(response => {
+        setDesignations([...designations, response.data]);
+        setDesignationName('');
+        setBasicSalary('');
+      })
+      .catch(error => {
+        console.error('Error saving designation:', error);
+        alert('Failed to save designation. Please try again.');
+      });
+  };
+
+  const onEdit = (index) => {
+    const designation = designations[index];
+    setEditDesignationName(designation.designationName);
+    setEditBasicSalary(designation.basicSalary);
+    setEditIndex(index);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdate = () => {
+    if (!editDesignationName || !editBasicSalary) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    const updatedData = {
+      designationName: editDesignationName.trim(),
+      basicSalary: parseFloat(editBasicSalary)
+    };
+
+    axios.put(`http://localhost:8083/api/designation/${designations[editIndex].id}`, updatedData)
+      .then(response => {
+        const updatedDesignations = [...designations];
+        updatedDesignations[editIndex] = response.data;
+        setDesignations(updatedDesignations);
+        setIsEditModalOpen(false);
+      })
+      .catch(error => {
+        console.error('Error updating designation:', error);
+        alert('Failed to update designation. Please try again.');
+      });
+  };
+
+  const onDelete = (index) => {
+    axios.delete(`http://localhost:8083/api/designation/${designations[index].id}`)
+      .then(() => {
+        setDesignations(designations.filter((_, i) => i !== index));
+      })
+      .catch(error => {
+        console.error('Error deleting designation:', error);
+      });
+  };
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const filteredDesignations = designations.filter(designation =>
+    designation.designationName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = filteredDesignations.slice(indexOfFirstRow, indexOfLastRow);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
-    <div className='absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200'>
-      <SubTopBar icon={<ApartmentOutlined />} name="Organization" secondname="Designation" arrow={<ArrowRightOutlined className='size-3'/>}/>
-    </div>
-    <div className='px-5 absolute left-[15%] top-28 w-[85%] flex justify-between'>
-    <div  className='h-[270px]'>
-      <AddOrganization name='Designation'/>
-    </div>
-  
-  <div className="w-[700px] bg-white px-3 py-3">
-    <p className="text-lg font-average font-bold">Add Designation</p>
-    <hr className="bg-blue-600 border-0 h-[2px] my-2" />
-    <TableTwo headers={headers} rows={departments} actions={handleActions} />
-  </div>
-  </div>
-  </>
-  )
+      <div className="absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200">
+        <SubTopBar icon={<ApartmentOutlined />} name="Organization" secondname="Designation" arrow={<ArrowRightOutlined className='size-3'/>}/>  
+       </div>
+        <div className="px-5 absolute left-[15%] top-28 w-[85%] flex justify-between">
+          <div className="w-[520px] bg-white px-3 py-3 h-[300px]">
+            <p className="text-lg font-average font-bold">Add Designation</p>
+            <hr className="bg-blue-600 border-0 h-[2px] my-2" />
+            <p className="text-base font-subtop">Designation Name</p>
+            <input
+              type="text"
+              value={designationName}
+              onChange={(e) => setDesignationName(e.target.value)}
+              placeholder="Enter Designation Name"
+              className="w-[490px] h-[35px] text-lg bg-custom-blue-2 rounded-md my-4"
+            />
+            <p className="text-base font-subtop">Basic Salary</p>
+            <input
+              type="number"
+              value={basicSalary}
+              onChange={(e) => setBasicSalary(e.target.value)}
+              placeholder="Enter Basic Salary"
+              className="w-[490px] h-[35px] text-lg bg-custom-blue-2 rounded-md my-4"
+            />
+            <div className="flex gap-2">
+              <OrganizationSaveButton
+                icon={<SaveOutlined />}
+                name="Save"
+                bgcolor="bg-custom-green"
+                onClick={handleSave}
+              />
+              <OrganizationSaveButton
+                icon={<CloseSquareOutlined />}
+                name="Close"
+                bgcolor="bg-custom-red"
+                onClick={() => {
+                  setDesignationName('');
+                  setBasicSalary('');
+                }}
+              />
+            </div>
+          </div>
+          <div className="w-[700px] bg-white px-3 py-3">
+            <p className="text-lg font-average font-bold">Designation List</p>
+            <hr className="bg-blue-600 border-0 h-[2px] my-2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Search by Designation"
+              className="w-full px-4 py-2 mb-4 border rounded-md"
+            />
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">Designation Name</th>
+                  <th className="border border-gray-300 px-4 py-2">Basic Salary</th>
+                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentRows.map((designation, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-300 px-4 py-2">{designation.designationName}</td>
+                    <td className="border border-gray-300 px-4 py-2">{designation.basicSalary}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <div className="flex space-x-2">
+                        <button
+                          className="text-blue-500"
+                          title="Edit"
+                          onClick={() => onEdit(index)}
+                        >
+                          <EditOutlined />
+                        </button>
+                        <button
+                          className="text-red-500"
+                          title="Delete"
+                          onClick={() => onDelete(index)}
+                        >
+                          <DeleteOutlined />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex justify-center mt-4">
+              {Array.from({ length: Math.ceil(filteredDesignations.length / rowsPerPage) }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
+                  className={`px-4 py-2 mx-1 border rounded-md ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white'}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-md">
+            <h2 className="text-lg font-bold mb-4">Edit Designation</h2>
+            <p className="text-base font-subtop">Designation Name</p>
+            <input
+              type="text"
+              value={editDesignationName}
+              onChange={(e) => setEditDesignationName(e.target.value)}
+              className="w-full h-[35px] text-lg bg-custom-blue-2 rounded-md my-2"
+            />
+            <p className="text-base font-subtop">Basic Salary</p>
+            <input
+              type="number"
+              value={editBasicSalary}
+              onChange={(e) => setEditBasicSalary(e.target.value)}
+              className="w-full h-[35px] text-lg bg-custom-blue-2 rounded-md my-2"
+            />
+            <div className="flex gap-2 mt-4">
+              <OrganizationSaveButton
+                icon={<SaveOutlined />}
+                name="Update"
+                bgcolor="bg-custom-green"
+                onClick={handleUpdate}
+              />
+              <OrganizationSaveButton
+                icon={<CloseSquareOutlined />}
+                name="Close"
+                bgcolor="bg-custom-red"
+                onClick={() => setIsEditModalOpen(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
-export default Designation
+function OrganizationSaveButton({ name, icon, bgcolor, onClick }) {
+  return (
+    <div>
+      <button onClick={onClick} className={`w-32 h-8 text-2xl font-average rounded-lg ${bgcolor}`}>
+        {icon} {name}
+      </button>
+    </div>
+  );
+}
+
+export default Designation;

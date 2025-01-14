@@ -2,7 +2,7 @@ import { ArrowRightOutlined, DeleteOutlined, EditOutlined, MenuOutlined, PlusSqu
 import React, { useState } from 'react'
 import SubTopBar from '../../TopBar/SubTopBar'
 import Table from '../../Table/Table';
-import Buttons_1 from '../../buttons/Buttons_1';
+import Buttons_1 from '../../Buttons/Buttons_1';
 import AddEmployeePopup from './AddEmployeePopup';
 
 
