@@ -5,7 +5,8 @@ import {
   DeleteOutlined,
   EditOutlined,
   SaveOutlined,
-  CloseSquareOutlined
+  CloseSquareOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import SubTopBar from '../../TopBar/SubTopBar';
@@ -110,7 +111,15 @@ function Designation() {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredDesignations.slice(indexOfFirstRow, indexOfLastRow);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(filteredDesignations.length / rowsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
 
   return (
     <>
@@ -168,27 +177,27 @@ function Designation() {
             <table className="w-full border-collapse border border-gray-300">
               <thead>
                 <tr>
-                  <th className="border border-gray-300 px-4 py-2">Designation Name</th>
-                  <th className="border border-gray-300 px-4 py-2">Basic Salary</th>
-                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                  <th className="border  px-4 py-2 bg-custom-blue">Designation Name</th>
+                  <th className="border  px-4 py-2 bg-custom-blue">Basic Salary</th>
+                  <th className="border  px-4 py-2 bg-custom-blue">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentRows.map((designation, index) => (
-                  <tr key={index}>
+                  <tr key={index} className="odd:bg-custom-blue-2 even:bg-custom-blue-3">
                     <td className="border border-gray-300 px-4 py-2">{designation.designationName}</td>
                     <td className="border border-gray-300 px-4 py-2">{designation.basicSalary}</td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="border  px-4 py-2 flex items-center justify-center">
                       <div className="flex space-x-2">
                         <button
-                          className="text-blue-500"
+                          className="bg-custom-blue text-white px-3 py-1 rounded"
                           title="Edit"
                           onClick={() => onEdit(index)}
                         >
                           <EditOutlined />
                         </button>
                         <button
-                          className="text-red-500"
+                          className="bg-red-500 text-white px-3 py-1 rounded"
                           title="Delete"
                           onClick={() => onDelete(index)}
                         >
@@ -200,17 +209,25 @@ function Designation() {
                 ))}
               </tbody>
             </table>
-            <div className="flex justify-center mt-4">
-              {Array.from({ length: Math.ceil(filteredDesignations.length / rowsPerPage) }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => paginate(i + 1)}
-                  className={`px-4 py-2 mx-1 border rounded-md ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white'}`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
+            <div className="mt-4 flex justify-between items-center">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="bg-custom-blue px-3 py-1 rounded disabled:opacity-50"
+            >
+              <ArrowLeftOutlined />
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="bg-custom-blue px-3 py-1 rounded disabled:opacity-50"
+            >
+              <ArrowRightOutlined />
+            </button>
+          </div>
           </div>
         </div>
       {isEditModalOpen && (

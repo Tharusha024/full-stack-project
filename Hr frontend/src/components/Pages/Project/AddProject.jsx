@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 function AddProject({ onClose }) {  
   const [formData, setFormData] = useState({
     projectTitle: "",
+    status:"",
     startDate: "",
     endDate: "",
     details: "",
@@ -23,7 +24,7 @@ function AddProject({ onClose }) {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:8080/api/employee", formData);
+      const response = await axios.post("http://localhost:8080/api/project", formData);
       console.log("Project added successfully:", response.data);
       alert("Project added successfully!");
       onClose(); 
@@ -46,8 +47,18 @@ function AddProject({ onClose }) {
               value={formData.projectTitle}
               onChange={handleChange}
               className="w-full border p-2 rounded"
+              placeholder='Enter project title'
               required
             />
+          </div>
+          <div className="mb-3">
+            <label className="block text-gray-700">Project Status</label>
+           <select className="w-full border p-2 rounded" name="status" value={formData.status} onChange={handleChange} required>
+            <option value="">select poject status</option>
+            <option value="upcoming">upcoming</option>
+            <option value="running">running</option>
+            <option value="completed">Completed</option>
+           </select>
           </div>
           <div className="mb-3">
             <label className="block text-gray-700">Start Date</label>
@@ -78,6 +89,7 @@ function AddProject({ onClose }) {
               value={formData.details}
               onChange={handleChange}
               className="w-full border p-2 rounded"
+              placeholder='Enter project details'
               required
             />
           </div>
@@ -92,6 +104,7 @@ function AddProject({ onClose }) {
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={handleSubmit}
             >
               Add Project
             </button>

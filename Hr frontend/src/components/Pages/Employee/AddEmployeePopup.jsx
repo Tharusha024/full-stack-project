@@ -20,7 +20,7 @@ function AddEmployeePopup({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/employee", formData);
+      const response = await axios.post("http://localhost:8082/api/employee", formData);
       console.log("Employee added successfully:", response.data);
       alert("Employee added successfully!");
       onClose(); // Close the popup after successful submission
@@ -36,7 +36,7 @@ function AddEmployeePopup({ onClose }) {
 
   // Fetch data from API when the component mounts
   useEffect(() => {
-    fetch('http://localhost:8081/api/department') // Replace with your API endpoint
+    fetch('http://localhost:8083/api/department') // Replace with your API endpoint
       .then(response => response.json())
       .then(data => {
         setOptions(data); // Set the dropdown options
@@ -108,13 +108,13 @@ function AddEmployeePopup({ onClose }) {
           <div className="mb-3">
             <label className="block text-gray-700">Department</label>
             <select
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange} // Handle change for userType
+              name="department" // Change name to "department" to match formData
+              value={formData.department} // Bind department value
+              onChange={handleChange} // Handle change for department
               className="w-full border p-2 rounded"
               required
             >
-              <option value="">Select User Type</option> {/* Default option */}
+              <option value="">Select Department</option> {/* Default option */}
               {options.map((option, index) => (
                 <option key={index} value={option.value}>
                   {option.name}

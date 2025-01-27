@@ -5,7 +5,8 @@ import {
   DeleteOutlined,
   EditOutlined,
   SaveOutlined,
-  CloseSquareOutlined
+  CloseSquareOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import SubTopBar from '../../TopBar/SubTopBar';
@@ -21,7 +22,6 @@ function Department() {
   const rowsPerPage = 5;
 
   useEffect(() => {
-    // Fetch departments from the backend
     axios.get('http://localhost:8083/api/department')
       .then(response => {
         setDepartments(response.data);
@@ -32,21 +32,17 @@ function Department() {
   }, []);
 
   const handleSave = () => {
-    if (!departmentName) {
+    if (!departmentName.trim()) {
       alert('Please fill out all fields.');
       return;
     }
 
-    const data = {
-      name: departmentName.trim()  // Send name instead of departmentName
-    };
+    const data = { name: departmentName.trim() };
 
-    // Send POST request to add new department
     axios.post('http://localhost:8083/api/department', data)
       .then(response => {
-        console.log('Department saved:', response.data);
         setDepartments(prevDepartments => [...prevDepartments, response.data]);
-        setDepartmentName('');  // Clear the input field after saving
+        setDepartmentName('');
       })
       .catch(error => {
         console.error('Error saving department:', error);
@@ -62,16 +58,13 @@ function Department() {
   };
 
   const handleUpdate = () => {
-    if (!editDepartmentName) {
+    if (!editDepartmentName.trim()) {
       alert('Please fill out all fields.');
       return;
     }
 
-    const updatedData = {
-      name: editDepartmentName.trim()  // Send name instead of departmentName
-    };
+    const updatedData = { name: editDepartmentName.trim() };
 
-    // Send PUT request to update department
     axios.put(`http://localhost:8083/api/department/${departments[editIndex].id}`, updatedData)
       .then(response => {
         const updatedDepartments = [...departments];
@@ -86,7 +79,6 @@ function Department() {
   };
 
   const onDelete = (id) => {
-    // Send DELETE request to remove department
     axios.delete(`http://localhost:8083/api/department/${id}`)
       .then(() => {
         setDepartments(departments.filter(department => department.id !== id));
@@ -105,11 +97,18 @@ function Department() {
     department.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filteredDepartments.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredDepartments.slice(indexOfFirstRow, indexOfLastRow);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
 
   return (
     <>
@@ -156,25 +155,25 @@ function Department() {
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr>
-                <th className="border border-gray-300 px-4 py-2">Department Name</th>
-                <th className="border border-gray-300 px-4 py-2">Actions</th>
+                <th className="border  px-4 py-2 bg-custom-blue">Department Name</th>
+                <th className="border  px-4 py-2 bg-custom-blue">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentRows.map((department) => (
-                <tr key={department.id}>
-                  <td className="border border-gray-300 px-4 py-2">{department.name}</td>
-                  <td className="border border-gray-300 px-4 py-2">
+                <tr key={department.id} className="odd:bg-custom-blue-2 even:bg-custom-blue-3">
+                  <td className="border  px-4 py-2">{department.name}</td>
+                  <td className="border  px-4 py-2 flex items-center justify-center">
                     <div className="flex space-x-2">
                       <button
-                        className="text-blue-500"
+                        className="bg-custom-blue text-white px-3 py-1 rounded"
                         title="Edit"
                         onClick={() => onEdit(departments.findIndex(d => d.id === department.id))}
                       >
                         <EditOutlined />
                       </button>
                       <button
-                        className="text-red-500"
+                        className="bg-red-500 text-white px-3 py-1 rounded"
                         title="Delete"
                         onClick={() => onDelete(department.id)}
                       >
@@ -186,16 +185,24 @@ function Department() {
               ))}
             </tbody>
           </table>
-          <div className="flex justify-center mt-4">
-            {Array.from({ length: Math.ceil(filteredDepartments.length / rowsPerPage) }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => paginate(i + 1)}
-                className={`px-4 py-2 mx-1 border rounded-md ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-white'}`}
-              >
-                {i + 1}
-              </button>
-            ))}
+          <div className="mt-4 flex justify-between items-center">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="bg-custom-blue px-3 py-1 rounded disabled:opacity-50"
+            >
+              <ArrowLeftOutlined />
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="bg-custom-blue px-3 py-1 rounded disabled:opacity-50"
+            >
+              <ArrowRightOutlined />
+            </button>
           </div>
         </div>
       </div>
@@ -234,11 +241,9 @@ function Department() {
 
 function OrganizationSaveButton({ name, icon, bgcolor, onClick }) {
   return (
-    <div>
-      <button onClick={onClick} className={`w-32 h-8 text-2xl font-average rounded-lg ${bgcolor}`}>
-        {icon} {name}
-      </button>
-    </div>
+    <button onClick={onClick} className={`w-32 h-8 text-2xl font-average rounded-lg ${bgcolor}`}>
+      {icon} {name}
+    </button>
   );
 }
 
