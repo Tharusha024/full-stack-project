@@ -1,233 +1,250 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusSquareOutlined, UserOutlined } from '@ant-design/icons';
-import SubTopBar from '../../TopBar/SubTopBar';
-import AddEmployeePopup from './AddEmployeePopup';
-import Buttons_1 from '../../Buttons/Buttons_1';
+import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const Employees = () => {
-  const headers = ["Employee Name", "Pin", "Email"];
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activePopup, setActivePopup] = useState(null);
-  const [userTypeFilter, setUserTypeFilter] = useState("active");
-  const [editEmployeeData, setEditEmployeeData] = useState(null);
+  const [employees, setEmployees] = useState([]); // Employee list
+  const [filteredEmployees, setFilteredEmployees] = useState([]); // For search results
+  const [searchQuery, setSearchQuery] = useState(''); // Search input
+  const [currentPage, setCurrentPage] = useState(1); // Pagination: Current page
+  const [employeesPerPage] = useState(5); // Number of employees per page
+  const [isEditing, setIsEditing] = useState(false); // Edit state
+  const [editEmployee, setEditEmployee] = useState(null);
+  const [userTypeFilter, setUserTypeFilter] = useState("active"); // Employee to be edited
 
-  // Fetch employees based on the userTypeFilter
-  const fetchEmployees = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:8082/api/employee/userType/${userTypeFilter}`);
-      const modifiedData = response.data.map(({ id, ...rest }) => rest); // Exclude 'id' from each item
-      setRows(modifiedData);
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch employees on component mount
   useEffect(() => {
-    fetchEmployees();
+    axios
+      .get(`http://localhost:8082/api/employee/userType/${userTypeFilter}`)
+      .then((response) => {
+        setEmployees(response.data);
+        setFilteredEmployees(response.data); // Initialize filtered list
+      })
+      .catch((error) => {
+        console.error('Error fetching employees:', error);
+      });
   }, [userTypeFilter]);
 
-  // Add a new employee
-  const addEmployee = async (employee) => {
-    try {
-      await axios.post('http://localhost:8082/api/employee', employee);
-      fetchEmployees(); // Refresh the list
-    } catch (error) {
-      console.error("Error adding employee:", error);
+  // Handle searching
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    setFilteredEmployees(
+      employees.filter(
+        (employee) =>
+          employee.name.toLowerCase().includes(query) ||
+          employee.email.toLowerCase().includes(query)
+      )
+    );
+  };
+
+  // Handle deleting an employee
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this employee?')) {
+      axios
+        .delete(`http://localhost:8082/api/employee/delete/${id}`)
+        .then(() => {
+          const updatedEmployees = employees.filter((employee) => employee.id !== id);
+          setEmployees(updatedEmployees);
+          setFilteredEmployees(updatedEmployees);
+        })
+        .catch((error) => {
+          console.error('Error deleting employee:', error);
+        });
     }
   };
 
-  // Update an employee
-  const updateEmployee = async (id, updatedEmployee) => {
-    try {
-      await axios.put(`http://localhost:8082/api/employee/update/${id}`, updatedEmployee);
-      fetchEmployees(); // Refresh the list after update
-      setActivePopup(null); // Close the popup after update
-    } catch (error) {
-      console.error("Error updating employee:", error);
+  // Handle editing an employee
+  const handleEdit = (id) => {
+    const employee = employees.find((employee) => employee.id === id);
+    setEditEmployee(employee);
+    setIsEditing(true); // Show the edit popup
+  };
+
+  // Handle form submission to update employee
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editEmployee) {
+      axios
+        .put(`http://localhost:8082/api/employee/update/${editEmployee.id}`, editEmployee)
+        .then((response) => {
+          // Update the employee list with the updated data
+          setEmployees(
+            employees.map((employee) =>
+              employee.id === response.data.id ? response.data : employee
+            )
+          );
+          setIsEditing(false); // Close the edit popup
+          setEditEmployee(null); // Reset editEmployee state
+        })
+        .catch((error) => console.error('Error updating employee:', error));
     }
   };
 
-  // Delete an employee
-  const deleteEmployee = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8082/api/employee/delete/${id}`);
-      fetchEmployees(); // Refresh the list after deletion
-    } catch (error) {
-      console.error("Error deleting employee:", error);
+  // Pagination logic
+  const totalPages = Math.ceil(filteredEmployees.length / employeesPerPage);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
-  // Handle actions like edit and delete
-  const handleActions = (row) => (
-    <>
-      <button className="bg-custom-blue text-white px-3 py-1 rounded" onClick={() => openEditPopup(row)}>
-        <EditOutlined />
-      </button>
-      <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => deleteEmployee(row.id)}>
-        <DeleteOutlined />
-      </button>
-    </>
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Get current employees based on pagination
+  const currentEmployees = filteredEmployees.slice(
+    (currentPage - 1) * employeesPerPage,
+    currentPage * employeesPerPage
   );
 
-  // Open the "Add Employee" popup
-  const handleAddEmployeeClick = () => setActivePopup('addEmployee');
-
-  // Close the active popup
-  const closePopup = () => setActivePopup(null);
-
-  // Open the Edit Employee popup
-  const openEditPopup = (employee) => {
-    setEditEmployeeData(employee);
-    setActivePopup('editEmployee');
-  };
-
   return (
-    <>
-      <div className="absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200">
-        <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Employees" arrow={<ArrowRightOutlined className="size-3" />} />
+    <div className="p-5">
+      {/* Search Bar */}
+      <div className="my-4 flex items-right justify-end">
+        <input
+          type="text"
+          placeholder="Search by Name or Email"
+          value={searchQuery}
+          onChange={handleSearch}
+          className="px-4 py-2 border border-gray-300 rounded w-[40%]"
+        />
       </div>
 
-      <div className="ml-5 absolute left-[15%] top-28 w-[85%]">
-        <div className="left-[15%] top-28 flex gap-5">
-          <Buttons_1
-            name="Add Employee"
-            bgColor="bg-custom-blue"
-            icon={<PlusSquareOutlined />}
-            onClick={handleAddEmployeeClick}
-          />
-        </div>
+      {/* Employee Table */}
+      <table className="w-full mt-4 border-collapse border border-gray-300 table-auto">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="py-2 border border-gray-300">Name</th>
+            <th className="py-2 border border-gray-300">Pin</th>
+            <th className="py-2 border border-gray-300">Email</th>
+            <th className="py-2 border border-gray-300">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentEmployees.map((employee) => (
+            <tr
+              key={employee.id}
+              className="odd:bg-custom-blue-2 even:bg-custom-blue-3 hover:bg-gray-100"
+            >
+              <td className="py-2 px-4 border border-gray-300">{employee.name}</td>
+              <td className="py-2 px-4 border border-gray-300">{employee.pin}</td>
+              <td className="py-2 px-4 border border-gray-300">{employee.email}</td>
+              <td className="py-2 px-4 border border-gray-300 flex gap-2">
+                <button
+                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                  onClick={() => handleEdit(employee.id)}
+                >
+                  <EditOutlined />
+                </button>
+                <button
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                  onClick={() => handleDelete(employee.id)}
+                >
+                  <DeleteOutlined />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {activePopup === 'addEmployee' && (
-          <AddEmployeePopup onClose={closePopup} onAdd={addEmployee} />
-        )}
-
-        {activePopup === 'editEmployee' && (
-          <EditEmployeePopup 
-            employeeData={editEmployeeData} 
-            onClose={closePopup} 
-            onUpdate={updateEmployee} 
-          />
-        )}
-
-        <div className="left-[15%] top-40 m-0 w-[95%] h-full bg-cyan-200">
-          <div className="flex text-center gap-1 my-4">
-            <UserOutlined className="size-6" />
-            <p className="text-base font-average">Employees List</p>
-          </div>
-          <hr className="bg-black border-0 h-[3px] my-2" />
-
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="border  px-4 py-2 bg-custom-blue">
-                  {headers.map((header, index) => (
-                    <th key={index} className="px-4 py-2 border-b">{header}</th>
-                  ))}
-                  <th className="px-4 py-2 border-b">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, index) => (
-                  <tr key={index} className="odd:bg-custom-blue-2 even:bg-custom-blue-3">
-                    <td className="px-4 py-2 border">{row.name}</td>
-                    <td className="px-4 py-2 border">{row.pin}</td>
-                    <td className="px-4 py-2 border">{row.email}</td>
-                    <td className="border  px-4 py-2 flex items-center justify-center gap-3">{handleActions(row)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-    </>
-  );
-};
-
-// EditEmployeePopup Component
-const EditEmployeePopup = ({ employeeData, onClose, onUpdate }) => {
-  const [name, setName] = useState('');
-  const [pin, setPin] = useState('');
-  const [email, setEmail] = useState('');
-  const [userType, setUserType] = useState('active'); // Default to 'active'
-
-  useEffect(() => {
-    if (employeeData) {
-      setName(employeeData.name);
-      setPin(employeeData.pin);
-      setEmail(employeeData.email);
-      setUserType(employeeData.userType || 'active');
-    }
-  }, [employeeData]);
-
-  const handleUpdate = () => {
-    if (name && pin && email) {
-      const updatedEmployee = { name, pin, email, userType };
-      onUpdate(employeeData.id, updatedEmployee); // Pass updated data to parent
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-8 rounded-lg max-w-lg w-full shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
-        
-        <label className="block text-sm font-medium mb-2">Name</label>
-        <input 
-          type="text" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
-        />
-        
-        <label className="block text-sm font-medium mb-2">Pin</label>
-        <input 
-          type="text" 
-          value={pin} 
-          onChange={(e) => setPin(e.target.value)} 
-          className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
-        />
-
-        <label className="block text-sm font-medium mb-2">Email</label>
-        <input 
-          type="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
-        />
-
-        <label className="block text-sm font-medium mb-2">User Type</label>
-        <select 
-          value={userType} 
-          onChange={(e) => setUserType(e.target.value)} 
-          className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
         >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={handleUpdate}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
-          >
-            Save
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-black px-6 py-2 rounded-lg hover:bg-gray-400 transition"
-          >
-            Cancel
-          </button>
-        </div>
+          <ArrowLeftOutlined /> Prev
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+        >
+          Next <ArrowRightOutlined />
+        </button>
       </div>
+
+      {/* Edit Popup */}
+      {isEditing && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg max-w-lg w-full shadow-lg">
+      <h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
+
+      <label className="block text-sm font-medium mb-2">Name</label>
+      <input
+        type="text"
+        value={editEmployee?.name || ''}
+        onChange={(e) =>
+          setEditEmployee((prev) => ({ ...prev, name: e.target.value }))
+        }
+        className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+      />
+
+      <label className="block text-sm font-medium mb-2">Pin</label>
+      <input
+        type="text"
+        value={editEmployee?.pin || ''}
+        onChange={(e) =>
+          setEditEmployee((prev) => ({ ...prev, pin: e.target.value }))
+        }
+        className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+      />
+
+      <label className="block text-sm font-medium mb-2">Email</label>
+      <input
+        type="email"
+        value={editEmployee?.email || ''}
+        onChange={(e) =>
+          setEditEmployee((prev) => ({ ...prev, email: e.target.value }))
+        }
+        className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+      />
+
+      <label className="block text-sm font-medium mb-2">User Type</label>
+      <select
+        value={editEmployee?.userType || ''}
+        onChange={(e) =>
+          setEditEmployee((prev) => ({ ...prev, userType: e.target.value }))
+        }
+        className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+      >
+        <option value="">Select User Type</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="disciplinary">Disciplinary</option>
+      </select>
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => {
+            setIsEditing(false); // Close the edit popup
+            setEditEmployee(null); // Reset editEmployee state
+          }}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
