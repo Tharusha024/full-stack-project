@@ -18,7 +18,7 @@ function AddAttendance({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/attendance", formData);
+      const response = await axios.post("http://localhost:8085/api/attendance", formData);
       console.log("Attendance recorded successfully:", response.data);
       alert("Attendance recorded successfully!");
       onClose(); 

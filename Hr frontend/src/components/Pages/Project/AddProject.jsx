@@ -24,7 +24,7 @@ function AddProject({ onClose }) {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:8080/api/project", formData);
+      const response = await axios.post("http://localhost:8084/api/project", formData);
       console.log("Project added successfully:", response.data);
       alert("Project added successfully!");
       onClose(); 

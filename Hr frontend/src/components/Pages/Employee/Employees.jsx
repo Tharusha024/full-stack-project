@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusSquareOutlined, UserOutlined } from '@ant-design/icons';
+import SubTopBar from '../../TopBar/SubTopBar';
+import Buttons_1 from '../../Buttons/Buttons_1';
+import AddEmployeePopup from './AddEmployeePopup';
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]); // Employee list
@@ -10,7 +13,8 @@ const Employees = () => {
   const [employeesPerPage] = useState(5); // Number of employees per page
   const [isEditing, setIsEditing] = useState(false); // Edit state
   const [editEmployee, setEditEmployee] = useState(null);
-  const [userTypeFilter, setUserTypeFilter] = useState("active"); // Employee to be edited
+  const [userTypeFilter, setUserTypeFilter] = useState("active");
+    const [activePopup, setActivePopup] = useState(null); // Employee to be edited
 
   // Fetch employees on component mount
   useEffect(() => {
@@ -51,6 +55,14 @@ const Employees = () => {
         .catch((error) => {
           console.error('Error deleting employee:', error);
         });
+    }
+  };
+  const addEmployee = async (employee) => {
+    try {
+      await axios.post('http://localhost:8082/api/employee', employee);
+      setEmployees([...employees, employee]);
+    } catch (error) {
+      console.error("Error adding employee:", error);
     }
   };
 
@@ -101,10 +113,34 @@ const Employees = () => {
     (currentPage - 1) * employeesPerPage,
     currentPage * employeesPerPage
   );
+  const handleAddEmployeeClick = () => setActivePopup('addEmployee');
+  const closePopup = () => setActivePopup(null);
 
   return (
-    <div className="p-5">
-      {/* Search Bar */}
+    <>
+    <div className="absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200">
+        <SubTopBar icon={<UserOutlined />} name="Employee" secondname="Employees" arrow={<ArrowRightOutlined className="size-3" />} />
+      </div>
+      <div className="ml-5 absolute left-[15%] top-28 w-[85%]">
+      <div className="left-[15%] top-28 flex gap-5">
+          <Buttons_1
+            name="Add Employee"
+            bgColor="bg-custom-blue"
+            icon={<PlusSquareOutlined />}
+            onClick={handleAddEmployeeClick}
+            
+          />
+        </div>
+        {activePopup === 'addEmployee' && (
+          <AddEmployeePopup onClose={closePopup} onAdd={addEmployee} />
+        )}
+
+    <div className="left-[15%] top-40 m-0 w-[95%] h-full bg-cyan-200">
+      <div className="flex text-center gap-1 my-4">
+      <UserOutlined className="size-6" />
+      <p className="text-base font-average">Employees List</p>
+      </div>
+      <hr className="bg-black border-0 h-[3px] my-2" />
       <div className="my-4 flex items-right justify-end">
         <input
           type="text"
@@ -115,14 +151,14 @@ const Employees = () => {
         />
       </div>
 
-      {/* Employee Table */}
+      
       <table className="w-full mt-4 border-collapse border border-gray-300 table-auto">
         <thead>
           <tr className="bg-gray-200">
-            <th className="py-2 border border-gray-300">Name</th>
-            <th className="py-2 border border-gray-300">Pin</th>
-            <th className="py-2 border border-gray-300">Email</th>
-            <th className="py-2 border border-gray-300">Actions</th>
+            <th className="border border-black  px-4 py-2 bg-custom-blue w-1/3">Name</th>
+            <th className="border border-black  px-4 py-2 bg-custom-blue w-1/6">Pin</th>
+            <th className="border border-black  px-4 py-2 bg-custom-blue w-1/3">Email</th>
+            <th className="border border-black  px-4 py-2 bg-custom-blue w-1/6">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -131,10 +167,11 @@ const Employees = () => {
               key={employee.id}
               className="odd:bg-custom-blue-2 even:bg-custom-blue-3 hover:bg-gray-100"
             >
-              <td className="py-2 px-4 border border-gray-300">{employee.name}</td>
-              <td className="py-2 px-4 border border-gray-300">{employee.pin}</td>
-              <td className="py-2 px-4 border border-gray-300">{employee.email}</td>
-              <td className="py-2 px-4 border border-gray-300 flex gap-2">
+              <td className="py-2 px-4 border border-black w-1/3">{employee.name}</td>
+              <td className="py-2 px-4 border border-black w-1/6">{employee.pin}</td>
+              <td className="py-2 px-4 border border-black w-1/3">{employee.email}</td>
+              <td className="border-b border-r border-black px-4 py-2 flex items-center justify-center space-x-2">
+              <div className="flex space-x-2">
                 <button
                   className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                   onClick={() => handleEdit(employee.id)}
@@ -147,6 +184,7 @@ const Employees = () => {
                 >
                   <DeleteOutlined />
                 </button>
+              </div>
               </td>
             </tr>
           ))}
@@ -158,9 +196,9 @@ const Employees = () => {
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+          className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
         >
-          <ArrowLeftOutlined /> Prev
+          <ArrowLeftOutlined />
         </button>
         <span>
           Page {currentPage} of {totalPages}
@@ -168,11 +206,12 @@ const Employees = () => {
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+          className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
         >
-          Next <ArrowRightOutlined />
+          <ArrowRightOutlined />
         </button>
       </div>
+    
 
       {/* Edit Popup */}
       {isEditing && (
@@ -221,7 +260,7 @@ const Employees = () => {
         <option value="">Select User Type</option>
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>
-        <option value="disciplinary">Disciplinary</option>
+       
       </select>
 
       <div className="flex justify-end gap-3">
@@ -243,9 +282,12 @@ const Employees = () => {
       </div>
     </div>
   </div>
+  
 )}
 
     </div>
+    </div>
+    </>
   );
 };
 
