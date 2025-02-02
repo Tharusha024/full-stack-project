@@ -19,7 +19,7 @@ const Employees = () => {
   // Fetch employees on component mount
   useEffect(() => {
     axios
-      .get(`http://localhost:8082/api/employee/userType/${userTypeFilter}`)
+      .get(`http://localhost:8083/api/employee/userType/${userTypeFilter}`)
       .then((response) => {
         setEmployees(response.data);
         setFilteredEmployees(response.data); // Initialize filtered list
@@ -46,7 +46,7 @@ const Employees = () => {
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       axios
-        .delete(`http://localhost:8082/api/employee/delete/${id}`)
+        .delete(`http://localhost:8083/api/employee/delete/${id}`)
         .then(() => {
           const updatedEmployees = employees.filter((employee) => employee.id !== id);
           setEmployees(updatedEmployees);
@@ -59,7 +59,7 @@ const Employees = () => {
   };
   const addEmployee = async (employee) => {
     try {
-      await axios.post('http://localhost:8082/api/employee', employee);
+      await axios.post('http://localhost:8083/api/employee', employee);
       setEmployees([...employees, employee]);
     } catch (error) {
       console.error("Error adding employee:", error);
@@ -78,7 +78,7 @@ const Employees = () => {
     e.preventDefault();
     if (editEmployee) {
       axios
-        .put(`http://localhost:8082/api/employee/update/${editEmployee.id}`, editEmployee)
+        .put(`http://localhost:8083/api/employee/update/${editEmployee.id}`, editEmployee)
         .then((response) => {
           // Update the employee list with the updated data
           setEmployees(

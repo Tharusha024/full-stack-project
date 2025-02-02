@@ -7,8 +7,6 @@ import Designation from "../Pages/Organization/Designation";
 import Employees from "../Pages/Employee/Employees";
 import Disciplinary from "../Pages/Employee/Disciplinary";
 import InactiveEmployee from "../Pages/Employee/InactiveEmployee";
-import AttendanceList from "../Pages/Attendance/AttendanceList";
-import AddAttendance from "../Pages/Attendance/AddAttendance";
 import AttendanceReport from "../Pages/Attendance/AttendanceReport";
 import LeaveApplication from "../Pages/Leave/LeaveApplication";
 import LeaveReport from "../Pages/Leave/LeaveReport";
@@ -41,10 +39,6 @@ function SideBar() {
         return <Disciplinary />;
       case "InactiveEmployee":
         return <InactiveEmployee />;
-      case "AttendanceList":
-        return <AttendanceList />;
-      case "AddAttendance":
-        return <AddAttendance />;
       case "AttendanceReport":
         return <AttendanceReport />;
       case "LeaveApplication":

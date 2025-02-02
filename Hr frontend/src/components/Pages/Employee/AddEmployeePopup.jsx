@@ -20,7 +20,7 @@ function AddEmployeePopup({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8082/api/employee", formData);
+      const response = await axios.post("http://localhost:8083/api/employee", formData);
       console.log("Employee added successfully:", response.data);
       alert("Employee added successfully!");
       onClose(); // Close the popup after successful submission

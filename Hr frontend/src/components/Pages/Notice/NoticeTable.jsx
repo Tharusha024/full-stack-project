@@ -1,24 +1,33 @@
-import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
-import EditNoticePopup from './EditNoticePopup'; // Ensure this file exists
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import EditNoticePopup from "./EditNoticePopup"; // Ensure this file exists
 
 function NoticeTable() {
-    const headers = ["Notice Name", "Notice File", "Start Date", "Details","Action"];
-    const rows = [
-        { title: "Notice 1", file: "notice image", date: "2024/02/12", details: "details" },
-        { title: "Notice 2", file: "notice image", date: "2024/03/01", details: "details" },
-        { title: "Notice 3", file: "notice image", date: "2024/04/10", details: "details" },
-        { title: "Notice 4", file: "notice image", date: "2024/02/12", details: "details" },
-    ];
-
+    const headers = ["Notice Name", "Notice File", "Date", "Action"];
+    const [notices, setNotices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(6); // Change for more/less rows per page
+    const [rowsPerPage] = useState(6);
     const [filterText, setFilterText] = useState("");
-    const [isEditPopupOpen, setEditPopupOpen] = useState(false); // Initialize state
-    const [editRow, setEditRow] = useState(null); // Initialize state
+    const [isEditPopupOpen, setEditPopupOpen] = useState(false);
+    const [editRow, setEditRow] = useState(null);
 
-    // Filter rows based on filterText
-    const filteredRows = rows.filter((row) =>
+    // Fetch notices from API
+    useEffect(() => {
+        const fetchNotices = async () => {
+            try {
+                const response = await axios.get("http://localhost:8087/api/notices");
+                setNotices(response.data);
+            } catch (error) {
+                console.error("Error fetching notices:", error);
+            }
+        };
+
+        fetchNotices();
+    }, []);
+
+    // Filter notices based on search input
+    const filteredRows = notices.filter((row) =>
         row.title.toLowerCase().includes(filterText.toLowerCase())
     );
 
@@ -30,7 +39,7 @@ function NoticeTable() {
 
     const handleFilterChange = (e) => {
         setFilterText(e.target.value);
-        setCurrentPage(1); // Reset to the first page on filter change
+        setCurrentPage(1);
     };
 
     const handleNextPage = () => {
@@ -56,12 +65,28 @@ function NoticeTable() {
         closeEditPopup();
     };
 
+    // Convert byte array to downloadable file
+    const downloadFile = (fileData, fileName, contentType) => {
+        const byteCharacters = atob(fileData); // Decode base64 string
+        const byteNumbers = new Array(byteCharacters.length).fill(null).map((_, i) =>
+            byteCharacters.charCodeAt(i)
+        );
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: contentType });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
-        <div className='m-[20px]'>
-            <div className='flex justify-end'>
+        <div className="m-[20px]">
+            <div className="flex justify-end">
                 <input
                     type="text"
-                    placeholder="Search by project name"
+                    placeholder="Search by notice name"
                     value={filterText}
                     onChange={handleFilterChange}
                     className="mb-4 p-2 border border-gray-300 rounded w-1/3"
@@ -71,24 +96,30 @@ function NoticeTable() {
                 <thead>
                     <tr className="bg-blue-500 text-white">
                         {headers.map((header, index) => (
-                            <th key={index} className="border border-gray-300 px-4 py-2 text-center">{header}</th>
+                            <th key={index} className="border border-gray-300 px-4 py-2 text-center">
+                                {header}
+                            </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
                     {currentRows.map((row, index) => (
                         <tr
-                            key={index}
+                            key={row.id}
                             className={`${
-                                index % 2 === 0
-                                    ? "bg-blue-100"
-                                    : "bg-blue-200"
+                                index % 2 === 0 ? "bg-blue-100" : "bg-blue-200"
                             } hover:bg-gray-100`}
                         >
                             <td className="border border-gray-300 px-4 py-2">{row.title}</td>
-                            <td className="border border-gray-300 px-4 py-2">{row.file}</td>
-                            <td className="border border-gray-300 px-4 py-2">{row.date}</td>
-                            <td className="border border-gray-300 px-4 py-2">{row.details}</td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <button
+                                    className="text-blue-600 underline"
+                                    onClick={() => downloadFile(row.fileData, row.fileName, row.contentType)}
+                                >
+                                    {row.fileName}
+                                </button>
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">{row.publishedDate}</td>
                             <td className="border border-gray-300 px-4 py-2 flex justify-center gap-2">
                                 <button
                                     className="bg-yellow-500 text-white px-3 py-1 rounded"
@@ -96,9 +127,7 @@ function NoticeTable() {
                                 >
                                     Edit
                                 </button>
-                                <button
-                                    className="bg-red-500 text-white px-3 py-1 rounded"
-                                >
+                                <button className="bg-red-500 text-white px-3 py-1 rounded">
                                     Delete
                                 </button>
                             </td>
@@ -126,11 +155,7 @@ function NoticeTable() {
                 </button>
             </div>
             {isEditPopupOpen && editRow && (
-                <EditNoticePopup
-                    row={editRow}
-                    onClose={closeEditPopup}
-                    onSave={saveEdit}
-                />
+                <EditNoticePopup row={editRow} onClose={closeEditPopup} onSave={saveEdit} />
             )}
         </div>
     );
