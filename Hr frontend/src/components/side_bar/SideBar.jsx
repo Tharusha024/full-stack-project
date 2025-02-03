@@ -68,14 +68,14 @@ function SideBar() {
   };
 
   return (
-    <Layout className="h-screen flex">
+    <Layout className="h-[100%] flex">
       <Sider width="15%" className="left-0 top-16 overflow-hidden hover:overflow-y-auto">
         {/* Sidebar Menu */}
         <MenuList isSelected={isSelected} setIsSelected={setIsSelected} />
       </Sider>
 
       {/* Content Area */}
-      <Layout className="p-4 flex-1 overflow-auto">{renderContent()}</Layout>
+      <Layout className="p-4 h-[100%] flex-1 overflow-auto">{renderContent()}</Layout>
     </Layout>
   );
 }
