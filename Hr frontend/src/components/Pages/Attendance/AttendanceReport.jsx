@@ -15,7 +15,7 @@ const AttendanceReport = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 10;  // Display 10 records per page
+  const recordsPerPage = 5;  // Display 10 records per page
 
   const months = [
     "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
@@ -30,7 +30,7 @@ const AttendanceReport = () => {
   // Fetch all employees
   const fetchEmployees = async () => {
     try {
-      const response = await fetch("http://localhost:8083/api/employee");
+      const response = await fetch("http://localhost:8082/api/employee");
       if (response.ok) {
         const data = await response.json();
         setEmployees(data);
@@ -51,7 +51,7 @@ const AttendanceReport = () => {
 
   const fetchEmployeeDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:8083/api/employee/pin/${pin}`);
+      const response = await fetch(`http://localhost:8082/api/employee/pin/${pin}`);
       if (response.ok) {
         const data = await response.json();
         setEmployeeDetails(data);
@@ -174,7 +174,7 @@ const AttendanceReport = () => {
       </div>
       <div className="text-center ml-5 absolute left-[15%] top-28 w-[85%] gap-1 pr-9">
         {/* Search Inputs */}
-        <div className="mt-5 bg-cyan-100 p-4 text-left">
+        <div className="bg-cyan-100 p-4 text-left">
           <p className="text-left text-lg font-subtop font-bold mb-4">Create Attendance Report</p>
           <div className="flex gap-4 justify-between pr-[160px]">
             <div>
@@ -221,16 +221,16 @@ const AttendanceReport = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-start mt-5 gap-10">
+        <div className="flex justify-start mt-5 gap-5">
           <button
             onClick={handleSearch}
-            className="w-40 h-9 bg-custom-blue text-xl font-average text-white rounded-lg"
+            className="w-28 h-6 bg-custom-blue text-lg font-average text-white rounded-lg"
           >
             Search
           </button>
           <button
             onClick={generatePDF}
-            className="w-40 h-9 bg-custom-blue text-xl font-average text-white rounded-lg"
+            className="w-40 h-6 bg-custom-blue text-lg font-average text-white rounded-lg"
           >
             Download PDF
           </button>
@@ -241,7 +241,7 @@ const AttendanceReport = () => {
 
         {/* Employee Details */}
         {employeeDetails && (
-          <div className="flex flex-col gap-2 mt-5 text-left bg-cyan-100 p-4">
+          <div className="flex flex-col gap-2 mt-2 text-left bg-cyan-100 p-4">
             <h2 className="text-left text-lg font-subtop font-bold mb-4">Employee Details</h2>
             <div className="flex gap-1 justify-between pr-[160px]">
               <p><strong>Name:</strong> {employeeDetails.name}</p>
