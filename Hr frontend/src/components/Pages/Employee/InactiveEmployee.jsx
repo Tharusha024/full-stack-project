@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusSquareOutlined, UserOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusSquareOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import SubTopBar from '../../TopBar/SubTopBar';
 import Buttons_1 from '../../Buttons/Buttons_1';
 import AddEmployeePopup from './AddEmployeePopup';
@@ -110,6 +110,26 @@ const InactiveEmployee = () => {
   const handleAddEmployeeClick = () => setActivePopup('addEmployee');
   const closePopup = () => setActivePopup(null);
 
+  // New function to handle user type change
+  const handleChangeUserType = (id, currentUserType) => {
+    const newUserType = currentUserType === 'inactive' ? 'active' : 'inactive';
+    const confirmChange = window.confirm(`Are you sure you want to change user type to active?`);
+    if (confirmChange) {
+      axios
+        .patch(`http://localhost:8080/api/employee/changeType/${id}?userType=active`)
+        .then(() => {
+          const updatedEmployees = employees.map((employee) =>
+            employee.id === id ? { ...employee, userType: newUserType } : employee
+          );
+          setEmployees(updatedEmployees);
+          setFilteredEmployees(updatedEmployees);
+        })
+        .catch((error) => {
+          console.error('Error changing user type:', error);
+        });
+    }
+  };
+
   return (
     <>
       <div className="absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200">
@@ -165,6 +185,12 @@ const InactiveEmployee = () => {
                       <button className="bg-red-500 text-white px-2 py-1 rounded" onClick={() => handleDelete(employee.id)}>
                         <DeleteOutlined />
                       </button>
+                      <button
+                        className="bg-yellow-500 text-white px-2 py-1 rounded"
+                        onClick={() => handleChangeUserType(employee.id, employee.userType)}
+                      >
+                        <UploadOutlined />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -192,34 +218,32 @@ const InactiveEmployee = () => {
                 <input
                   type="text"
                   value={editEmployee?.name || ''}
-                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, name: e.target.value }))} 
                   className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
                 />
                 <label className="block text-sm font-medium mb-2">Pin</label>
                 <input
                   type="text"
                   value={editEmployee?.pin || ''}
-                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, pin: e.target.value }))}
+                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, pin: e.target.value }))} 
                   className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
                 />
                 <label className="block text-sm font-medium mb-2">Email</label>
                 <input
                   type="email"
                   value={editEmployee?.email || ''}
-                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, email: e.target.value }))} 
                   className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
                 />
-              <label className="block text-sm font-medium mb-2">User Type</label>
-              <select
-              value={editEmployee?.userType || ''}
-              onChange={(e) =>
-              setEditEmployee((prev) => ({ ...prev, userType: e.target.value }))
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
-              >
-              <option value="inactive">Inactive</option>
-              <option value="active">Active</option>
-              </select>
+                <label className="block text-sm font-medium mb-2">User Type</label>
+                <select
+                  value={editEmployee?.userType || ''}
+                  onChange={(e) => setEditEmployee((prev) => ({ ...prev, userType: e.target.value }))} 
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+                >
+                  <option value="inactive">Inactive</option>
+                  <option value="active">Active</option>
+                </select>
                 <div className="flex justify-end gap-3">
                   <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
                     Cancel
