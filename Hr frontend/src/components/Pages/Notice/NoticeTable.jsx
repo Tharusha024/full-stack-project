@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ArrowLeftOutlined, ArrowRightOutlined ,DeleteOutlined, EditOutlined } from "@ant-design/icons"; 
+import { ArrowLeftOutlined, ArrowRightOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const NoticeTable = () => {
   const [notices, setNotices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Number of items per page
+  const [itemsPerPage] = useState(5);
   const [editNotice, setEditNotice] = useState(null);
-  const [isEditingNotice, setIsEditingNotice] = useState(false); // For controlling popup visibility
+  const [isEditingNotice, setIsEditingNotice] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredNotices, setFilteredNotices] = useState([]);
 
@@ -27,17 +27,18 @@ const NoticeTable = () => {
 
   const handleEdit = (notice) => {
     setEditNotice(notice);
-    setIsEditingNotice(true); // Show the edit modal
+    setIsEditingNotice(true);
   };
 
   const handleSave = async () => {
     try {
-      // Send the updated notice to the API using the PUT request
-      await axios.put(`http://localhost:8087/api/notices/${editNotice.id}`, editNotice);
+      const { id, noticeId, title, fileName } = editNotice;
+      const url = `http://localhost:8087/api/notices/${id}?noticeId=${encodeURIComponent(noticeId)}&title=${encodeURIComponent(title)}&fileName=${encodeURIComponent(fileName)}`;
 
-      // Close the popup and refresh the notices list
+      await axios.put(url);
+
       setIsEditingNotice(false);
-      fetchNotices(); // Refresh the notices list after saving
+      fetchNotices();
     } catch (error) {
       console.error("Error updating notice:", error);
     }
@@ -46,7 +47,7 @@ const NoticeTable = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8087/api/notices/${id}`);
-      fetchNotices(); // Refresh the data
+      fetchNotices();
     } catch (error) {
       console.error("Error deleting notice:", error);
     }
@@ -67,21 +68,14 @@ const NoticeTable = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentNotices = filteredNotices.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(filteredNotices.length / itemsPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   return (
@@ -192,30 +186,9 @@ const NoticeTable = () => {
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Published Date:</label>
-              <input
-                type="date"
-                value={editNotice.publishedDate}
-                onChange={(e) => setEditNotice({ ...editNotice, publishedDate: e.target.value })}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
             <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => setIsEditingNotice(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
-              >
-                Save
-              </button>
+              <button onClick={() => setIsEditingNotice(false)} className="bg-gray-500 text-white px-4 py-2 rounded-md">Cancel</button>
+              <button onClick={handleSave} className="bg-blue-500 text-white px-4 py-2 rounded-md">Save</button>
             </div>
           </div>
         </div>

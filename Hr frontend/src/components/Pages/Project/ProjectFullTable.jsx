@@ -11,13 +11,13 @@ function ProjectFullTable() {
   const [isEditing, setIsEditing] = useState(false); // Edit state
   const [editProject, setEditProject] = useState(null); // Project to be edited
 
-  // Fetch projects on component mount
+ 
   useEffect(() => {
     axios
       .get('http://localhost:8084/api/project')
       .then((response) => {
         setProjects(response.data);
-        setFilteredProjects(response.data); // Initialize filtered list
+        setFilteredProjects(response.data); 
       })
       .catch((error) => {
         console.error('Error fetching projects:', error);
@@ -75,18 +75,18 @@ function ProjectFullTable() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateDates(editProject.startDate, editProject.endDate)) {
-        return; // Prevent form submission if the dates are invalid
+        return; 
       }
 
     if (editProject) {
       axios.put(`http://localhost:8084/api/project/update-project/${editProject.id}`, editProject)
         .then((response) => {
-          // Update the project list with the updated project data
+          
           setProjects(projects.map(project => 
             project.id === response.data.id ? response.data : project
           ));
-          setIsEditing(false); // Close the edit popup
-          setEditProject(null); // Reset editProject state
+          setIsEditing(false); 
+          setEditProject(null); 
         })
         .catch((error) => console.error('Error updating project:', error));
     }
