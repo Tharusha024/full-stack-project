@@ -18,7 +18,7 @@ const InactiveEmployee = () => {
   // Fetch inactive employees on component mount
   useEffect(() => {
     axios
-      .get('http://localhost:8083/api/employee/userType/inactive')
+      .get('http://localhost:8080/api/employee/userType/inactive')
       .then((response) => {
         setEmployees(response.data);
         setFilteredEmployees(response.data);
@@ -43,7 +43,7 @@ const InactiveEmployee = () => {
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       axios
-        .delete(`http://localhost:8083/api/employee/delete/${id}`)
+        .delete(`http://localhost:8080/api/employee/delete/${id}`)
         .then(() => {
           const updatedEmployees = employees.filter((employee) => employee.id !== id);
           setEmployees(updatedEmployees);
@@ -57,7 +57,7 @@ const InactiveEmployee = () => {
 
   const addEmployee = async (employee) => {
     try {
-      await axios.post('http://localhost:8083/api/employee', employee);
+      await axios.post('http://localhost:8080/api/employee', employee);
       setEmployees([...employees, employee]);
     } catch (error) {
       console.error('Error adding employee:', error);
@@ -74,7 +74,7 @@ const InactiveEmployee = () => {
     e.preventDefault();
     if (editEmployee) {
       axios
-        .put(`http://localhost:8083/api/employee/update/${editEmployee.id}`, editEmployee)
+        .put(`http://localhost:8080/api/employee/update/${editEmployee.id}`, editEmployee)
         .then((response) => {
           setEmployees(
             employees.map((employee) =>

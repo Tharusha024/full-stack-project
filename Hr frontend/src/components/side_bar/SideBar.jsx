@@ -13,7 +13,6 @@ import LeaveReport from "../Pages/Leave/LeaveReport";
 import Projects from "../Pages/Project/Projects";
 import TaskList from "../Pages/Project/TaskList";
 import PayrollList from "../Pages/Payroll/PayrollList";
-import CheckPayroll from "../Pages/Payroll/CheckPayroll";
 import AssetsCategory from "../Pages/Assets/AssetsCategory";
 import AssetsList from "../Pages/Assets/AssetsList";
 import Notice from "../Pages/Notice/Notice";
@@ -50,9 +49,7 @@ function SideBar() {
       case "TaskList":
         return <TaskList />; 
       case "PayrollList":
-        return <PayrollList />; 
-      case "CheckPayroll":
-        return <CheckPayroll />;  
+        return <PayrollList />;   
       case "AssetsCategory":
         return <AssetsCategory />; 
       case "AssetsList":

@@ -17,12 +17,12 @@ function AddTask({ onClose }) {
 
   useEffect(() => {
     // Fetch projects
-    axios.get("http://localhost:8082/api/project")
+    axios.get("http://localhost:8084/api/project")
       .then(response => setProjects(response.data))
       .catch(error => console.error("Error fetching projects:", error));
 
     // Fetch employees
-    axios.get("http://localhost:8083/api/employee")
+    axios.get("http://localhost:8080/api/employee")
       .then(response => {
         // Map employees to the format required by react-select
         const employeeOptions = response.data.map(employee => ({

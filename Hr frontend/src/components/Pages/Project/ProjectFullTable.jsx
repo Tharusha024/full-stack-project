@@ -14,7 +14,7 @@ function ProjectFullTable() {
   // Fetch projects on component mount
   useEffect(() => {
     axios
-      .get('http://localhost:8082/api/project')
+      .get('http://localhost:8084/api/project')
       .then((response) => {
         setProjects(response.data);
         setFilteredProjects(response.data); // Initialize filtered list
@@ -41,7 +41,7 @@ function ProjectFullTable() {
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       axios
-        .delete(`http://localhost:8082/api/project/delete-project/${id}`)
+        .delete(`http://localhost:8084/api/project/delete-project/${id}`)
         .then(() => {
           const updatedProjects = projects.filter((project) => project.id !== id);
           setProjects(updatedProjects);
@@ -79,7 +79,7 @@ function ProjectFullTable() {
       }
 
     if (editProject) {
-      axios.put(`http://localhost:8082/api/project/update-project/${editProject.id}`, editProject)
+      axios.put(`http://localhost:8084/api/project/update-project/${editProject.id}`, editProject)
         .then((response) => {
           // Update the project list with the updated project data
           setProjects(projects.map(project => 

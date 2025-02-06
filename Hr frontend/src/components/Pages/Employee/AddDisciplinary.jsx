@@ -16,7 +16,7 @@ function AddDisciplinary({ onClose }) {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("http://localhost:8082/api/employee");
+        const response = await axios.get("http://localhost:8080/api/employee");
         setEmployees(response.data); // Store API response
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -39,7 +39,7 @@ function AddDisciplinary({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8082/api/employeeDisciplinary", formData);
+      const response = await axios.post("http://localhost:8080/api/employeeDisciplinary", formData);
       console.log("Disciplinary record added successfully:", response.data);
       alert("Disciplinary record added successfully!");
       onClose();

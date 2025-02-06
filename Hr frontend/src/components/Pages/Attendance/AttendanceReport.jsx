@@ -30,7 +30,7 @@ const AttendanceReport = () => {
   // Fetch all employees
   const fetchEmployees = async () => {
     try {
-      const response = await fetch("http://localhost:8082/api/employee");
+      const response = await fetch("http://localhost:8080/api/employee");
       if (response.ok) {
         const data = await response.json();
         setEmployees(data);
@@ -51,7 +51,7 @@ const AttendanceReport = () => {
 
   const fetchEmployeeDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:8082/api/employee/pin/${pin}`);
+      const response = await fetch(`http://localhost:8080/api/employee/pin/${pin}`);
       if (response.ok) {
         const data = await response.json();
         setEmployeeDetails(data);
@@ -74,7 +74,7 @@ const AttendanceReport = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8085/api/attendance/employee-pin/${pin}/month/${month.toLowerCase()}/year/${year}`
+        `http://localhost:8082/api/attendance/employee-pin/${pin}/month/${month.toLowerCase()}/year/${year}`
       );
       if (response.ok) {
         const data = await response.json();

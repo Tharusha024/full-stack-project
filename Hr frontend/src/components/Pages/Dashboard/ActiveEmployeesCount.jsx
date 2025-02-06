@@ -9,7 +9,7 @@ const ActiveEmployeesCount = () => {
   useEffect(() => {
     const fetchActiveEmployees = async () => {
       try {
-        const response = await axios.get('http://localhost:8082/api/employee/userType/active');
+        const response = await axios.get('http://localhost:8080/api/employee/userType/active');
         // Assuming the response data is an array of active employees
         setActiveCount(response.data.length);
       } catch (err) {

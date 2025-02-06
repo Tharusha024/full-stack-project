@@ -20,13 +20,13 @@ const TaskList = () => {
   useEffect(() => {
     // Fetch project names
     axios
-      .get("http://localhost:8082/api/project")
+      .get("http://localhost:8084/api/project")
       .then((response) => setProjects(response.data))
       .catch((error) => console.error("Error fetching projects:", error));
 
     // Fetch employees
     axios
-      .get("http://localhost:8083/api/employee")
+      .get("http://localhost:8080/api/employee")
       .then((response) => setEmployees(response.data))
       .catch((error) => console.error("Error fetching employees:", error));
   }, []);
@@ -103,11 +103,11 @@ const TaskList = () => {
   return (
     <>
       <div className="absolute left-[15%] top-16 p-0 m-0 w-[85%] bg-cyan-200 h-full">
-        <SubTopBar icon={<ProjectOutlined />} name="Project" secondname="Projects" arrow={<ArrowRightOutlined className="size-3" />} />
+        <SubTopBar icon={<ProjectOutlined />} name="Project" secondname="Task List" arrow={<ArrowRightOutlined className="size-3" />} />
       </div>
       <div className="ml-5 absolute left-[15%] top-28 w-[85%]">
         <div className="left-[15%] top-28 flex gap-5">
-          <Buttons_1 name="Add New Project" bgColor="bg-custom-blue" icon={<PlusSquareOutlined />} onClick={handleAddTaskClick} />
+          <Buttons_1 name="Add New Task" bgColor="bg-custom-blue" icon={<PlusSquareOutlined />} onClick={handleAddTaskClick} />
         </div>
         {activePopup === 'addTask' && (
           <AddTask onClose={closePopup} />
@@ -197,7 +197,7 @@ const TaskList = () => {
     <p className="font-average my-1"><strong>status:</strong> {taskDetails.status}</p>
     <p className="font-average my-1"><strong>Start Date:</strong> {taskDetails.startDate}</p>
     <p className="font-average my-1"><strong>End Date:</strong> {taskDetails.endDate}</p>
-    <p className="font-average my-1"><strong>status:</strong> {taskDetails.status}</p>
+    
 
     <div className="flex gap-4 mt-3">
       <button 

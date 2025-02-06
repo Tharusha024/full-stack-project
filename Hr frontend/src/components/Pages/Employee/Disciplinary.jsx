@@ -17,7 +17,7 @@ const Disciplinary = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:8083/api/employeeDisciplinary')
+      .get('http://localhost:8080/api/employeeDisciplinary')
       .then((response) => {
         setDisciplinaryRecords(response.data);
         setFilteredRecords(response.data);
@@ -42,7 +42,7 @@ const Disciplinary = () => {
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       axios
-        .delete(`http://localhost:8083/api/employeeDisciplinary/delete/${id}`)
+        .delete(`http://localhost:8080/api/employeeDisciplinary/delete/${id}`)
         .then(() => {
           const updatedRecords = disciplinaryRecords.filter((record) => record.id !== id);
           setDisciplinaryRecords(updatedRecords);
@@ -56,7 +56,7 @@ const Disciplinary = () => {
 
   const addDisciplinaryRecord = async (record) => {
     try {
-      await axios.post('http://localhost:8083/api/employeeDisciplinary', record);
+      await axios.post('http://localhost:8080/api/employeeDisciplinary', record);
       setDisciplinaryRecords([...disciplinaryRecords, record]);
     } catch (error) {
       console.error('Error adding record:', error);
@@ -73,7 +73,7 @@ const Disciplinary = () => {
     e.preventDefault();
     if (editRecord) {
       axios
-        .put(`http://localhost:8083/api/employeeDisciplinary/update/${editRecord.id}`, editRecord)
+        .put(`http://localhost:8080/api/employeeDisciplinary/update/${editRecord.id}`, editRecord)
         .then((response) => {
           setDisciplinaryRecords(
             disciplinaryRecords.map((record) =>
