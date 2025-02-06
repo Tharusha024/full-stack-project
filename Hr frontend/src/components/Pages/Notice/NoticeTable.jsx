@@ -1,164 +1,227 @@
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import EditNoticePopup from "./EditNoticePopup"; // Ensure this file exists
+import { ArrowLeftOutlined, ArrowRightOutlined ,DeleteOutlined, EditOutlined } from "@ant-design/icons"; 
 
-function NoticeTable() {
-    const headers = ["Notice Name", "Notice File", "Date", "Action"];
-    const [notices, setNotices] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(6);
-    const [filterText, setFilterText] = useState("");
-    const [isEditPopupOpen, setEditPopupOpen] = useState(false);
-    const [editRow, setEditRow] = useState(null);
+const NoticeTable = () => {
+  const [notices, setNotices] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Number of items per page
+  const [editNotice, setEditNotice] = useState(null);
+  const [isEditingNotice, setIsEditingNotice] = useState(false); // For controlling popup visibility
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredNotices, setFilteredNotices] = useState([]);
 
-    // Fetch notices from API
-    useEffect(() => {
-        const fetchNotices = async () => {
-            try {
-                const response = await axios.get("http://localhost:8087/api/notices");
-                setNotices(response.data);
-            } catch (error) {
-                console.error("Error fetching notices:", error);
-            }
-        };
+  useEffect(() => {
+    fetchNotices();
+  }, []);
 
-        fetchNotices();
-    }, []);
+  const fetchNotices = async () => {
+    try {
+      const response = await axios.get("http://localhost:8087/api/notices");
+      setNotices(response.data);
+      setFilteredNotices(response.data);
+    } catch (error) {
+      console.error("Error fetching notices:", error);
+    }
+  };
 
-    // Filter notices based on search input
-    const filteredRows = notices.filter((row) =>
-        row.title.toLowerCase().includes(filterText.toLowerCase())
+  const handleEdit = (notice) => {
+    setEditNotice(notice);
+    setIsEditingNotice(true); // Show the edit modal
+  };
+
+  const handleSave = async () => {
+    try {
+      // Send the updated notice to the API using the PUT request
+      await axios.put(`http://localhost:8087/api/notices/${editNotice.id}`, editNotice);
+
+      // Close the popup and refresh the notices list
+      setIsEditingNotice(false);
+      fetchNotices(); // Refresh the notices list after saving
+    } catch (error) {
+      console.error("Error updating notice:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8087/api/notices/${id}`);
+      fetchNotices(); // Refresh the data
+    } catch (error) {
+      console.error("Error deleting notice:", error);
+    }
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    setFilteredNotices(
+      notices.filter(
+        (notice) =>
+          notice.noticeId.toString().includes(query) ||
+          notice.title.toLowerCase().includes(query)
+      )
     );
+  };
 
-    // Pagination logic
-    const indexOfLastRow = currentPage * rowsPerPage;
-    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-    const currentRows = filteredRows.slice(indexOfFirstRow, indexOfLastRow);
-    const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentNotices = filteredNotices.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handleFilterChange = (e) => {
-        setFilterText(e.target.value);
-        setCurrentPage(1);
-    };
+  const totalPages = Math.ceil(filteredNotices.length / itemsPerPage);
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-    };
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const handlePrevPage = () => {
-        if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-    };
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
-    const openEditPopup = (row) => {
-        setEditRow(row);
-        setEditPopupOpen(true);
-    };
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-    const closeEditPopup = () => {
-        setEditPopupOpen(false);
-        setEditRow(null);
-    };
+  return (
+    <div>
+      {/* Search Bar */}
+      <div className="my-4 flex items-right justify-end">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearch}
+          placeholder="Search by Notice ID or Title"
+          className="px-4 py-2 border border-gray-300 rounded w-[40%]"
+        />
+      </div>
 
-    const saveEdit = (updatedRow) => {
-        console.log("Updated Row:", updatedRow);
-        closeEditPopup();
-    };
+      <table className="w-full mt-4 border-collapse border border-gray-300 table-auto">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="py-2 border border-gray-300 bg-custom-blue w-[100px]">Notice ID</th>
+            <th className="py-2 border border-gray-300 bg-custom-blue w-[400px]">Title</th>
+            <th className="py-2 border border-gray-300 bg-custom-blue w-[500px]">File Name</th>
+            <th className="py-2 border border-gray-300 bg-custom-blue w-[120px]">Published Date</th>
+            <th className="py-2 border border-gray-300 bg-custom-blue">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentNotices.map((notice) => (
+            <tr key={notice.id} className="odd:bg-custom-blue-2 even:bg-custom-blue-3 hover:bg-gray-100 h-[60px]">
+              <td className="py-2 px-4 border border-gray-300">{notice.noticeId}</td>
+              <td className="py-2 px-4 border border-gray-300">{notice.title}</td>
+              <td className="py-2 px-4 border border-gray-300">
+                <a href={notice.fileName} target="_blank" rel="noopener noreferrer">
+                  {notice.fileName}
+                </a>
+              </td>
+              <td className="py-2 px-4 border border-gray-300">{notice.publishedDate}</td>
+              <td className="px-4 py-2 flex items-center justify-center border-gray-300">
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => handleEdit(notice)}
+                    className="bg-custom-blue text-white px-2 rounded"
+                    title="Edit"
+                  >
+                    <EditOutlined /> 
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(notice.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    title="Delete"
+                  >
+                    <DeleteOutlined />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-    // Convert byte array to downloadable file
-    const downloadFile = (fileData, fileName, contentType) => {
-        const byteCharacters = atob(fileData); // Decode base64 string
-        const byteNumbers = new Array(byteCharacters.length).fill(null).map((_, i) =>
-            byteCharacters.charCodeAt(i)
-        );
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: contentType });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+      {/* Pagination */}
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
+        >
+          <ArrowLeftOutlined />
+        </button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
+        >
+          <ArrowRightOutlined />
+        </button>
+      </div>
 
-    return (
-        <div className="m-[20px]">
-            <div className="flex justify-end">
-                <input
-                    type="text"
-                    placeholder="Search by notice name"
-                    value={filterText}
-                    onChange={handleFilterChange}
-                    className="mb-4 p-2 border border-gray-300 rounded w-1/3"
-                />
+      {/* Edit Notice Modal */}
+      {isEditingNotice && editNotice && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Edit Notice</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Notice ID:</label>
+              <input
+                type="text"
+                value={editNotice.noticeId}
+                onChange={(e) => setEditNotice({ ...editNotice, noticeId: e.target.value })}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
             </div>
-            <table className="table-auto w-full border-collapse border border-gray-200">
-                <thead>
-                    <tr className="bg-blue-500 text-white">
-                        {headers.map((header, index) => (
-                            <th key={index} className="border border-gray-300 px-4 py-2 text-center">
-                                {header}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentRows.map((row, index) => (
-                        <tr
-                            key={row.id}
-                            className={`${
-                                index % 2 === 0 ? "bg-blue-100" : "bg-blue-200"
-                            } hover:bg-gray-100`}
-                        >
-                            <td className="border border-gray-300 px-4 py-2">{row.title}</td>
-                            <td className="border border-gray-300 px-4 py-2">
-                                <button
-                                    className="text-blue-600 underline"
-                                    onClick={() => downloadFile(row.fileData, row.fileName, row.contentType)}
-                                >
-                                    {row.fileName}
-                                </button>
-                            </td>
-                            <td className="border border-gray-300 px-4 py-2">{row.publishedDate}</td>
-                            <td className="border border-gray-300 px-4 py-2 flex justify-center gap-2">
-                                <button
-                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
-                                    onClick={() => openEditPopup(row)}
-                                >
-                                    Edit
-                                </button>
-                                <button className="bg-red-500 text-white px-3 py-1 rounded">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div className="mt-4 flex justify-between items-center">
-                <button
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 1}
-                    className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
-                >
-                    <ArrowLeftOutlined />
-                </button>
-                <span>
-                    Page {currentPage} of {totalPages}
-                </span>
-                <button
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
-                >
-                    <ArrowRightOutlined />
-                </button>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Title:</label>
+              <input
+                type="text"
+                value={editNotice.title}
+                onChange={(e) => setEditNotice({ ...editNotice, title: e.target.value })}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
             </div>
-            {isEditPopupOpen && editRow && (
-                <EditNoticePopup row={editRow} onClose={closeEditPopup} onSave={saveEdit} />
-            )}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">File Name:</label>
+              <input
+                type="text"
+                value={editNotice.fileName}
+                onChange={(e) => setEditNotice({ ...editNotice, fileName: e.target.value })}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Published Date:</label>
+              <input
+                type="date"
+                value={editNotice.publishedDate}
+                onChange={(e) => setEditNotice({ ...editNotice, publishedDate: e.target.value })}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={() => setIsEditingNotice(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
-    );
-}
+      )}
+    </div>
+  );
+};
 
 export default NoticeTable;
