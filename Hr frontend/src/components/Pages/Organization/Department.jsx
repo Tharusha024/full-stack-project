@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import SubTopBar from '../../TopBar/SubTopBar';
+import { toast } from 'react-hot-toast';
 
 function Department() {
   const [departmentName, setDepartmentName] = useState('');
@@ -43,6 +44,7 @@ function Department() {
       .then(response => {
         setDepartments(prevDepartments => [...prevDepartments, response.data]);
         setDepartmentName('');
+        toast.success("succesfully add new department")
       })
       .catch(error => {
         console.error('Error saving department:', error);
