@@ -1,106 +1,124 @@
-import { ArrowRightOutlined, LaptopOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import { ArrowRightOutlined, LaptopOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
 import SubTopBar from '../../TopBar/SubTopBar';
 
 const AssetCategory = () => {
-  const [categories, setCategories] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [formData, setFormData] = useState({ name: '' });
-  const [editMode, setEditMode] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState([
+    { id: 1, name: "Electronics", description: "Devices like laptops, phones, and tablets" },
+    { id: 2, name: "Furniture", description: "Office furniture including chairs and desks" },
+    { id: 3, name: "Vehicles", description: "Company-owned vehicles for transportation" },
+  ]);
 
-  useEffect(() => {
-    fetch('/api/assets/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error('Error fetching categories:', err));
-  }, []);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({ id: null, name: "", description: "" });
 
-  const handleAddCategory = () => {
-    setShowPopup(true);
-    setEditMode(false);
-    setFormData({ name: '' });
+  const handleOpenModal = (category = { id: null, name: "", description: "" }) => {
+    setFormData(category);
+    setShowModal(true);
   };
 
-  const handleEditCategory = (category) => {
-    setShowPopup(true);
-    setEditMode(true);
-    setSelectedCategory(category.id);
-    setFormData({ name: category.name });
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
-  const handleDeleteCategory = async (id) => {
-    await fetch(`/api/assets/categories/${id}`, { method: 'DELETE' });
-    setCategories(categories.filter(category => category.id !== id));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const method = editMode ? 'PUT' : 'POST';
-    const url = editMode ? `/api/assets/categories/${selectedCategory}` : '/api/assets/categories';
-    
-    const response = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
-
-    const data = await response.json();
-    if (editMode) {
-      setCategories(categories.map(cat => (cat.id === selectedCategory ? data : cat)));
+    if (formData.id) {
+      setCategories(categories.map(cat => cat.id === formData.id ? formData : cat));
     } else {
-      setCategories([...categories, data]);
+      setCategories([...categories, { ...formData, id: categories.length + 1 }]);
     }
-    setShowPopup(false);
+    handleCloseModal();
+  };
+
+  const handleDelete = (id) => {
+    setCategories(categories.filter(cat => cat.id !== id));
   };
 
   return (
-    <div className='absolute left-[15%] top-16 p-5 w-[85%] h-full bg-custom-blue-4'>
-      <SubTopBar icon={<LaptopOutlined />} name='Assets' secondname='Asset Categories' arrow={<ArrowRightOutlined className='size-3' />} />
+    <div className="absolute left-[15%] top-16 p-5 w-[85%] h-full bg-custom-blue-4">
+      <SubTopBar 
+        icon={<LaptopOutlined className="text-custom-blue" />} 
+        name="Assets" 
+        secondname="Asset Categories" 
+        arrow={<ArrowRightOutlined className="size-3 text-custom-blue" />} 
+      />
 
-      <div className='mt-5 bg-white p-5 rounded-lg shadow-lg'>
-        <div className='flex justify-between mb-4'>
-          <h2 className='text-xl font-semibold text-gray-700'>Asset Categories</h2>
-          <button onClick={handleAddCategory} className='bg-custom-blue text-white px-4 py-2 rounded hover:bg-custom-blue-2 flex items-center'>
-            <PlusOutlined className='mr-2' /> Add Category
+      {/* Header Section */}
+      <div className="mt-5 bg-white p-5 rounded-lg shadow-lg">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-700">Asset Categories</h2>
+          <button 
+            className="bg-custom-blue text-white px-4 py-2 rounded hover:bg-custom-blue-2 transition flex items-center"
+            onClick={() => handleOpenModal()}
+          >
+            <PlusOutlined className="mr-2" /> Add Category
           </button>
         </div>
 
-        <table className='w-full border-collapse border border-gray-300 text-center rounded-lg'>
-          <thead className='bg-custom-blue text-white uppercase'>
-            <tr>
-              <th className='border border-gray-300 p-3'>Category Name</th>
-              <th className='border border-gray-300 p-3'>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map(category => (
-              <tr key={category.id} className='bg-custom-blue-2 hover:bg-custom-blue-3 transition duration-200'>
-                <td className='border border-gray-300 p-3'>{category.name}</td>
-                <td className='border border-gray-300 p-3 flex justify-center space-x-4'>
-                  <button onClick={() => handleEditCategory(category)} className='text-green-600 hover:text-green-800'><EditOutlined /></button>
-                  <button onClick={() => handleDeleteCategory(category.id)} className='text-red-600 hover:text-red-800'><DeleteOutlined /></button>
-                </td>
+        {/* Table Section */}
+        <div className="overflow-x-auto mt-4">
+          <table className="w-full border-collapse border border-gray-300 text-center rounded-lg">
+            <thead className="bg-custom-blue text-white uppercase">
+              <tr>
+                <th className="border border-gray-300 p-3">ID</th>
+                <th className="border border-gray-300 p-3">Category Name</th>
+                <th className="border border-gray-300 p-3">Description</th>
+                <th className="border border-gray-300 p-3">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {categories.map((category) => (
+                <tr key={category.id} className="bg-custom-blue-2 hover:bg-custom-blue-3 transition duration-200">
+                  <td className="border border-gray-300 p-3">{category.id}</td>
+                  <td className="border border-gray-300 p-3">{category.name}</td>
+                  <td className="border border-gray-300 p-3">{category.description}</td>
+                  <td className="border border-gray-300 p-3 flex justify-center space-x-3">
+                    <button 
+                      className="text-green-600 hover:text-green-800 transition"
+                      onClick={() => handleOpenModal(category)}
+                    >
+                      <EditOutlined />
+                    </button>
+                    <button 
+                      className="text-red-600 hover:text-red-800 transition"
+                      onClick={() => handleDelete(category.id)}
+                    >
+                      <DeleteOutlined />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {showPopup && (
-        <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center'>
-          <div className='bg-white p-5 rounded shadow-lg w-1/3'>
-            <h2 className='text-lg font-semibold mb-4'>{editMode ? 'Edit' : 'Add'} Category</h2>
-            <form onSubmit={handleSubmit} className='space-y-4'>
+      {/* Modal for Adding/Editing Category */}
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-lg font-semibold mb-4">{formData.id ? "Edit" : "Add"} Category</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input 
-                type='text' 
-                placeholder='Category Name' 
-                className='w-full p-2 border rounded' 
-                required 
-                value={formData.name} 
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                type="text" 
+                placeholder="Category Name" 
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full p-2 border rounded focus:ring focus:ring-custom-blue"
+                required
               />
-              <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700'>Save</button>
+              <textarea 
+                placeholder="Description" 
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full p-2 border rounded focus:ring focus:ring-custom-blue"
+                required
+              />
+              <div className="flex justify-between">
+                <button type="button" className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700" onClick={handleCloseModal}>Cancel</button>
+                <button type="submit" className="bg-custom-blue text-white px-4 py-2 rounded hover:bg-custom-blue-2">Save</button>
+              </div>
             </form>
           </div>
         </div>
