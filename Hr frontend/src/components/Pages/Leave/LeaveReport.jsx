@@ -109,7 +109,7 @@ const LeaveReport = () => {
         {/* Pagination Buttons */}
         <div className="flex justify-between mt-4">
           <button className="bg-custom-blue text-white px-4 py-2 rounded hover:bg-custom-blue-2 transition font-average">◀ Previous</button>
-          <span className="text-gray-600 font-average">Page 1</span>
+          <span className="text-gray-600 font-average">Page 1233233</span>
           <button className="bg-custom-blue text-white px-4 py-2 rounded hover:bg-custom-blue-2 transition font-average">Next ▶</button>
         </div>
       </div>
