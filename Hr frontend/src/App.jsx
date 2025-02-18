@@ -11,7 +11,7 @@ function App() {
         <Route path="/" element={<LoggingPage />} />
         <Route path="/Home" element={<Home />} />
       </Routes>
-      <Toaster position="top-right" autoClose={3000} />
+      <Toaster position="top-right"/>
     </>
   );
 }

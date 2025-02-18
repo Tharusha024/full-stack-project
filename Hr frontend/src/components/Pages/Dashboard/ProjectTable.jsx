@@ -2,7 +2,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 
 function ProjectTable() {
-    const headers = ["ID","Project Name", "Start Date", "End Date"];
+    const headers = ["ID", "Project Name", "Start Date", "End Date"];
     const [projects, setProjects] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage] = useState(6);
@@ -19,7 +19,8 @@ function ProjectTable() {
                     throw new Error("Failed to fetch projects");
                 }
                 const data = await response.json();
-                setProjects(data);
+                console.log("Fetched Projects:", data); // Debugging output
+                setProjects(Array.isArray(data) ? data : []);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -31,14 +32,14 @@ function ProjectTable() {
 
     // Filter rows based on input
     const filteredRows = projects.filter((row) =>
-        row.projectTitle.toLowerCase().includes(filterText.toLowerCase())
+        row.projectTitle?.toLowerCase().includes(filterText.toLowerCase())
     );
 
     // Pagination logic
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentRows = filteredRows.slice(indexOfFirstRow, indexOfLastRow);
-    const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
 
     const handleFilterChange = (e) => {
         setFilterText(e.target.value);
@@ -53,19 +54,19 @@ function ProjectTable() {
         if (currentPage > 1) setCurrentPage((prev) => prev - 1);
     };
 
-    if (loading) return <p>Loading projects...</p>;
+    if (loading) return <p className="text-gray-600">Loading projects...</p>;
     if (error) return <p className="text-red-500">Error: {error}</p>;
 
     return (
-        <div className="m-[20px]">
-            <div className="flex justify-between">
-                <h1 className="font-average text-xl font-medium text-black">Running Projects</h1>
+        <div className="m-5">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="font-semibold text-xl text-black">Running Projects</h1>
                 <input
                     type="text"
                     placeholder="Search by project name"
                     value={filterText}
                     onChange={handleFilterChange}
-                    className="mb-4 p-2 border border-gray-300 rounded w-1/3"
+                    className="p-2 border border-gray-300 rounded w-1/3"
                 />
             </div>
             <table className="table-auto w-full border-collapse border border-gray-200">
@@ -79,17 +80,25 @@ function ProjectTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentRows.map((row, index) => (
-                        <tr
-                            key={index}
-                            className={`${index % 2 === 0 ? "bg-blue-100" : "bg-blue-200"} hover:bg-gray-100`}
-                        >   
-                            <td className="border border-gray-300 text-center py-2">{row.projectId}</td>
-                            <td className="border border-gray-300  py-2">{row.projectTitle}</td>
-                            <td className="border border-gray-300 text-center py-2">{row.startDate}</td>
-                            <td className="border border-gray-300 text-center py-2">{row.endDate}</td>
+                    {currentRows.length > 0 ? (
+                        currentRows.map((row, index) => (
+                            <tr
+                                key={row.projectId || index}
+                                className={`${index % 2 === 0 ? "bg-blue-100" : "bg-blue-200"} hover:bg-gray-100`}
+                            >
+                                <td className="border border-gray-300 text-center py-2">{row.projectId || "N/A"}</td>
+                                <td className="border border-gray-300 py-2">{row.projectTitle || "N/A"}</td>
+                                <td className="border border-gray-300 text-center py-2">{row.startDate || "N/A"}</td>
+                                <td className="border border-gray-300 text-center py-2">{row.endDate || "N/A"}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={4} className="text-center py-4 text-gray-600">
+                                No projects found
+                            </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
             <div className="mt-4 flex justify-between items-center">
@@ -116,4 +125,3 @@ function ProjectTable() {
 }
 
 export default ProjectTable;
-

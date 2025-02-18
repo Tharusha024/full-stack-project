@@ -10,7 +10,8 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import SubTopBar from '../../TopBar/SubTopBar';
-import { toast } from 'react-hot-toast';
+import ToastSuccess from '../../ToastMessage/ToastSuccess';
+import ToastFaild from '../../ToastMessage/ToastFaild';
 
 function Department() {
   const [departmentName, setDepartmentName] = useState('');
@@ -34,7 +35,7 @@ function Department() {
 
   const handleSave = () => {
     if (!departmentName.trim()) {
-      alert('Please fill out all fields.');
+      ToastFaild({ message: "Fill in Deparment Name" });
       return;
     }
 
@@ -44,11 +45,11 @@ function Department() {
       .then(response => {
         setDepartments(prevDepartments => [...prevDepartments, response.data]);
         setDepartmentName('');
-        toast.success("succesfully add new department")
+        ToastSuccess({message: "succesfully add new department"})
       })
       .catch(error => {
         console.error('Error saving department:', error);
-        alert('Failed to save department. Please try again.');
+        ToastFaild({message:"Failed to save department. Please try again."})
       });
   };
 
@@ -61,7 +62,7 @@ function Department() {
 
   const handleUpdate = () => {
     if (!editDepartmentName.trim()) {
-      alert('Please fill out all fields.');
+      ToastFaild({ message: "Please fill out all fields." });
       return;
     }
 
@@ -76,7 +77,7 @@ function Department() {
       })
       .catch(error => {
         console.error('Error updating department:', error);
-        alert('Failed to update department. Please try again.');
+        ToastFaild({ message: "Failed to update department. Please try again." });
       });
   };
 
@@ -84,6 +85,7 @@ function Department() {
     axios.delete(`http://localhost:8083/api/department/${id}`)
       .then(() => {
         setDepartments(departments.filter(department => department.id !== id));
+        ToastSuccess({ message: `Successfully deleted department` });
       })
       .catch(error => {
         console.error('Error deleting department:', error);
@@ -132,13 +134,13 @@ function Department() {
           <div className="flex gap-2">
             <OrganizationSaveButton
               icon={<SaveOutlined />}
-              name="Save"
+              name=""
               bgcolor="bg-custom-green"
               onClick={handleSave}
             />
             <OrganizationSaveButton
               icon={<CloseSquareOutlined />}
-              name="Close"
+              name=""
               bgcolor="bg-custom-red"
               onClick={() => setDepartmentName('')}
             />
@@ -243,7 +245,7 @@ function Department() {
 
 function OrganizationSaveButton({ name, icon, bgcolor, onClick }) {
   return (
-    <button onClick={onClick} className={`w-32 h-8 text-2xl font-average rounded-lg ${bgcolor}`}>
+    <button onClick={onClick} className={`w-16 h-8 text-2xl font-average rounded-lg ${bgcolor}`}>
       {icon} {name}
     </button>
   );
