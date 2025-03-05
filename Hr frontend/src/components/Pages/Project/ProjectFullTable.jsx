@@ -75,18 +75,23 @@ function ProjectFullTable() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateDates(editProject.startDate, editProject.endDate)) {
-        return; 
-      }
-
+      return;
+    }
+  
     if (editProject) {
-      axios.put(`http://localhost:8084/api/project/update-project/${editProject.id}`, editProject)
+      axios
+        .put(`http://localhost:8084/api/project/update-project/${editProject.id}`, editProject)
         .then((response) => {
-          
-          setProjects(projects.map(project => 
+          // Update projects state without refreshing
+          setProjects(projects.map(project =>
             project.id === response.data.id ? response.data : project
           ));
-          setIsEditing(false); 
-          setEditProject(null); 
+          setFilteredProjects(filteredProjects.map(project =>
+            project.id === response.data.id ? response.data : project
+          ));
+          
+          setIsEditing(false); // Close the edit modal
+          setEditProject(null); // Clear the edit form
         })
         .catch((error) => console.error('Error updating project:', error));
     }

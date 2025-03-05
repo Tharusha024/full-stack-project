@@ -7,7 +7,8 @@ function AddEmployeePopup({ onClose }) {
     pin: "",
     email: "",
     contact: "",
-    department: "", 
+    department: "",
+    designation: "",
   });
 
   const handleChange = (e) => {
@@ -30,20 +31,33 @@ function AddEmployeePopup({ onClose }) {
     }
   };
 
-  const [options, setOptions] = useState([]); // State to hold the dropdown options
+  const [departmentOptions, setDepartmentOptions] = useState([]); // State to hold department options
+  const [designationOptions, setDesignationOptions] = useState([]); // State to hold designation options
   const [loading, setLoading] = useState(true); // State to track loading state
   const [error, setError] = useState(null); // State to track error if any
 
-  // Fetch data from API when the component mounts
+  // Fetch department and designation data when the component mounts
   useEffect(() => {
+    // Fetch department data
     fetch('http://localhost:8083/api/department') // Replace with your API endpoint
       .then(response => response.json())
       .then(data => {
-        setOptions(data); // Set the dropdown options
+        setDepartmentOptions(data); // Set the department options
+      })
+      .catch(err => {
+        setError('Error fetching department data');
+        setLoading(false);
+      });
+
+    // Fetch designation data
+    fetch('http://localhost:8083/api/designation') // Replace with your API endpoint
+      .then(response => response.json())
+      .then(data => {
+        setDesignationOptions(data); // Set the designation options
         setLoading(false); // Set loading to false after data is fetched
       })
       .catch(err => {
-        setError('Error fetching data');
+        setError('Error fetching designation data');
         setLoading(false);
       });
   }, []);
@@ -115,9 +129,26 @@ function AddEmployeePopup({ onClose }) {
               required
             >
               <option value="">Select Department</option> {/* Default option */}
-              {options.map((option, index) => (
+              {departmentOptions.map((option, index) => (
                 <option key={index} value={option.value}>
                   {option.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="block text-gray-700">Designation</label>
+            <select
+              name="designation" // Change name to "designation" to match formData
+              value={formData.designation} // Bind designation value
+              onChange={handleChange} // Handle change for designation
+              className="w-full border p-2 rounded"
+              required
+            >
+              <option value="">Select Designation</option> {/* Default option */}
+              {designationOptions.map((option, index) => (
+                <option key={index} value={option.designationName}>
+                  {option.designationName}
                 </option>
               ))}
             </select>
