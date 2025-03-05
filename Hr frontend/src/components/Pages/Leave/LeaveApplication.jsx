@@ -1,156 +1,215 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { ArrowLeftOutlined, ArrowRightOutlined, CheckCircleFilled, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, EditOutlined, FileExclamationOutlined, UserOutlined } from '@ant-design/icons';
 import SubTopBar from '../../TopBar/SubTopBar';
-import { ArrowRightOutlined, FileExclamationOutlined } from '@ant-design/icons';
 
 const LeaveApplication = () => {
-  const [leaveData, setLeaveData] = useState([
-    {
-      employeeName: "Vichaksha Viduranga",
-      pin: "100",
-      leaveType: "Casual Leave",
-      applyDate: "03/01/25",
-      startDate: "04/01/25",
-      endDate: "05/02/25",
-      duration: "32 days",
-      details: "Personal Leave",
-      reference: "HR-001",
-      contact: "1234567890",
-      department: "HR",
-      status: "Not Approved"
-    },
-    {
-      employeeName: "G.V.Viduranga",
-      pin: "100",
-      leaveType: "Casual Leave",
-      applyDate: "03/11/24",
-      startDate: "04/11/24",
-      endDate: "05/11/24",
-      duration: "1 days",
-      details: "Medical Emergency",
-      reference: "HR-002",
-      contact: "9876543210",
-      department: "Finance",
-      status: "Not Approved"
+  const [leaveApplications, setLeaveApplications] = useState([]);
+  const [filteredLeaves, setFilteredLeaves] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [leavesPerPage] = useState(5);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLeave, setEditLeave] = useState(null);
+
+  useEffect(() => {
+    axios.get('http://localhost:8086/api/leave')
+      .then(response => {
+        const pendingLeaves = response.data.filter(leave => leave.status === 'Pending');
+        setLeaveApplications(pendingLeaves);
+        setFilteredLeaves(pendingLeaves);
+      })
+      .catch(error => console.error('Error fetching leave applications:', error));
+  }, []);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    setFilteredLeaves(leaveApplications.filter(leave => 
+      leave.employeeName.toLowerCase().includes(query) ||
+      leave.leaveType.toLowerCase().includes(query)
+    ));
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this leave application?')) {
+      axios.delete(`http://localhost:8086/api/leave/delete/${id}`)
+        .then(() => {
+          const updatedLeaves = leaveApplications.filter(leave => leave.id !== id);
+          setLeaveApplications(updatedLeaves);
+          setFilteredLeaves(updatedLeaves);
+        })
+        .catch(error => console.error('Error deleting leave application:', error));
     }
-  ]);
-
-  const [showPopup, setShowPopup] = useState(false);
-  const [formData, setFormData] = useState({
-    employeeName: "",
-    pin: "",
-    leaveType: "",
-    applyDate: "",
-    startDate: "",
-    endDate: "",
-    duration: "",
-    details: "",
-    reference: "",
-    contact: "",
-    department: "",
-    status: "Pending"
-  });
-
-  const handleAddLeaveApplication = () => {
-    setShowPopup(true);
   };
 
-  const handleClosePopup = () => {
-    setShowPopup(false);
+  const handleEdit = (leave) => {
+    setEditLeave(leave);
+    setIsEditing(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLeaveData([...leaveData, formData]);
-    setShowPopup(false);
+    if (new Date(editLeave.startDate) >= new Date(editLeave.endDate)) {
+      alert("Start date must be before end date.");
+      return;
+    }
+    try {
+      await axios.put(`http://localhost:8086/api/leave/update/${editLeave.id}`, editLeave);
+      const response = await axios.get("http://localhost:8086/api/leave");
+      const pendingLeaves = response.data.filter(leave => leave.status === 'Pending');
+      setLeaveApplications(pendingLeaves);
+      setFilteredLeaves(pendingLeaves);
+      alert("Leave application updated successfully!");
+      setIsEditing(false);
+      setEditLeave(null);
+    } catch (error) {
+      console.error("Error updating leave application:", error);
+      alert("Failed to update leave application. Please try again.");
+    }
+  };
+
+  const totalLeaves = filteredLeaves.length;
+  const totalPages = Math.ceil(totalLeaves / leavesPerPage);
+  const currentLeaves = filteredLeaves.slice((currentPage - 1) * leavesPerPage, currentPage * leavesPerPage);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   return (
-    <div className="absolute left-[15%] top-16 p-5 w-[85%] h-full bg-custom-blue-2">
-      <SubTopBar
-        icon={<FileExclamationOutlined />}
-        name="Leave"
-        secondname="Leave Application"
-        arrow={<ArrowRightOutlined className="size-3" />}
-      />
-
-      <div className="flex justify-between mt-5">
-        <button 
-          onClick={handleAddLeaveApplication} 
-          className="bg-custom-blue text-white px-4 py-2 rounded hover:bg-blue-700 font-menu"
-        >
-          ➕ Add Leave Application
-        </button>
+    <>
+      <div className="absolute left-[15%] top-16 p-0 m-0 w-[85%] h-full bg-cyan-200">
+        <SubTopBar icon={<UserOutlined />} name="Leave Application" secondname="Leave Requests" arrow={<ArrowRightOutlined className="size-3" />} />
       </div>
-
-      <div className="mt-5 bg-white p-5 rounded-lg shadow-lg">
-        <table className="w-full border-collapse border border-gray-300 text-center font-average">
-          <thead className="bg-custom-blue text-white">
-            <tr>
-              <th className="border border-gray-300 p-2">Employee Name</th>
-              <th className="border border-gray-300 p-2">PIN</th>
-              <th className="border border-gray-300 p-2">Leave Type</th>
-              <th className="border border-gray-300 p-2">Apply Date</th>
-              <th className="border border-gray-300 p-2">Start Date</th>
-              <th className="border border-gray-300 p-2">End Date</th>
-              <th className="border border-gray-300 p-2">Duration</th>
-              <th className="border border-gray-300 p-2">Details</th>
-              <th className="border border-gray-300 p-2">Reference</th>
-              <th className="border border-gray-300 p-2">Contact</th>
-              <th className="border border-gray-300 p-2">Department</th>
-              <th className="border border-gray-300 p-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaveData.map((leave, index) => (
-              <tr key={index} className="bg-custom-blue-3 hover:bg-gray-200">
-                <td className="border border-gray-300 p-2">{leave.employeeName}</td>
-                <td className="border border-gray-300 p-2">{leave.pin}</td>
-                <td className="border border-gray-300 p-2">{leave.leaveType}</td>
-                <td className="border border-gray-300 p-2">{leave.applyDate}</td>
-                <td className="border border-gray-300 p-2">{leave.startDate}</td>
-                <td className="border border-gray-300 p-2">{leave.endDate}</td>
-                <td className="border border-gray-300 p-2">{leave.duration}</td>
-                <td className="border border-gray-300 p-2">{leave.details}</td>
-                <td className="border border-gray-300 p-2">{leave.reference}</td>
-                <td className="border border-gray-300 p-2">{leave.contact}</td>
-                <td className="border border-gray-300 p-2">{leave.department}</td>
-                <td className="border border-gray-300 p-2">{leave.status}</td>
+      <div className="ml-5 absolute left-[15%] top-28 w-[85%]">
+        <div className="left-[15%] top-40 m-0 w-[95%] h-full bg-cyan-200">
+          <div className="flex text-center gap-1 my-4">
+            <FileExclamationOutlined className="size-6" />
+            <p className="text-base font-average">Leave Application List</p>
+          </div>
+          <hr className="bg-black border-0 h-[3px] my-2" />
+          <div className="my-4 flex items-right justify-end">
+            <input type="text" placeholder="Search by Employee or Leave Type" value={searchQuery} onChange={handleSearch} className="px-4 py-2 border border-gray-300 rounded w-[40%] my-4" />
+          </div>
+          <table className="w-full mt-4 border-collapse border border-gray-300 table-auto">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/5">Employee Name</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/12">Pin</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/6">Leave Type</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/6">Apply Date</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/6">Start Date</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/6">End Date</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/12">Duration</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/12">Status</th>
+                <th className="border border-black px-4 py-2 bg-custom-blue w-1/4">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentLeaves.map(leave => (
+                <tr key={leave.id} className="odd:bg-custom-blue-2 even:bg-custom-blue-3 hover:bg-gray-100">
+                  <td className="py-2 px-4 border border-black w-1/5">{leave.employeeName}</td>
+                  <td className="py-2 px-4 border border-black w-1/12">{leave.pin}</td>
+                  <td className="py-2 px-4 border border-black w-1/6">{leave.leaveType}</td>
+                  <td className="py-2 px-4 border border-black w-1/6">{leave.applyDate}</td>
+                  <td className="py-2 px-4 border border-black w-1/6">{leave.startDate}</td>
+                  <td className="py-2 px-4 border border-black w-1/6">{leave.endDate}</td>
+                  <td className="py-2 px-4 border border-black w-1/12">{leave.duration}</td>
+                  <td className="py-2 px-4 border border-black w-1/12">{leave.status}</td>
+                  <td className="py-2 px-4 border border-black w-1/4">
+                    <div className="flex space-x-2 justify-center">
+                      <button 
+                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                        title='Edit' 
+                        onClick={() => handleEdit(leave)}><EditOutlined /></button>
+                      <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600" 
+                        title='Approved' 
+                        onClick={() => handleStatusUpdate(leave.id, "Approved")}>
+                        <CheckCircleOutlined />
+                      </button>
+                      <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                        title='Reject' 
+                        onClick={() => handleStatusUpdate(leave.id, "Rejected")}>
+                        <CloseCircleOutlined />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
+            >
+              <ArrowLeftOutlined />
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="bg-blue-500 px-3 py-1 rounded disabled:opacity-50"
+            >
+              <ArrowRightOutlined />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {showPopup && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded shadow-lg w-1/3 font-subtop">
-            <h2 className="text-lg font-semibold mb-4 text-custom-blue">Add Leave Application</h2>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <input type="text" placeholder="Employee Name" className="w-full p-2 border rounded" required onChange={(e) => setFormData({ ...formData, employeeName: e.target.value })} />
-              <input type="text" placeholder="PIN" className="w-full p-2 border rounded" required onChange={(e) => setFormData({ ...formData, pin: e.target.value })} />
-              <select className="w-full p-2 border rounded" required onChange={(e) => setFormData({ ...formData, leaveType: e.target.value })}>
-                <option value="">Select Leave Type</option>
-                <option value="Casual Leave">Casual Leave</option>
-                <option value="Sick Leave">Sick Leave</option>
-                <option value="Annual Leave">Annual Leave</option>
-              </select>
-              <select className="w-full p-2 border rounded" required onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-              <input type="text" placeholder="Duration" className="w-full p-2 border rounded" required onChange={(e) => setFormData({ ...formData, duration: e.target.value })} />
-              <button type="submit" className="bg-custom-green text-white px-4 py-2 rounded hover:bg-green-700 font-average">
-                Submit
-              </button>
-              <button type="button" onClick={handleClosePopup} className="bg-custom-red text-white px-4 py-2 rounded hover:bg-red-700 ml-2 font-average">
-                Cancel
-              </button>
-            </form>
+      {isEditing && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-cyan-200 p-8 rounded-lg max-w-lg w-full shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Edit Leave Application</h2>
+            <label className="block text-sm font-medium mb-2">Employee Name</label>
+            <input type="text" value={editLeave?.employeeName || ''} onChange={(e) => setEditLeave({ ...editLeave, employeeName: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4" readOnly />
+            <label className="block text-sm font-medium mb-2">Leave Type</label>
+            <select
+              value={editLeave?.leaveType || ''}
+              onChange={(e) => setEditLeave({ ...editLeave, leaveType: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+            >
+              <option value="">Select Leave Type</option>
+              <option value="Annual Leave">Annual Leave</option>
+              <option value="Sick Leave">Sick Leave</option>
+              <option value="Maternity Leave">Maternity Leave</option>
+              <option value="Paternity Leave">Paternity Leave</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Unpaid Leave">Unpaid Leave</option>
+              <option value="Compensatory Leave">Compensatory Leave</option>
+              <option value="Study Leave">Study Leave</option>
+              <option value="Emergency Leave">Emergency Leave</option>
+              <option value="Bereavement Leave">Bereavement Leave</option>
+              <option value="Special Leave">Special Leave</option>
+            </select>
+            <label className="block text-sm font-medium mb-2">Start Date</label>
+            <input 
+              type="date" value={editLeave?.startDate || ''} 
+              onChange={(e) => setEditLeave({ ...editLeave, startDate: e.target.value })} 
+              className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"/>
+            <label className="block text-sm font-medium mb-2">End Date</label>
+            <input 
+              type="date" value={editLeave?.endDate || ''} 
+              onChange={(e) => setEditLeave({ ...editLeave, endDate: e.target.value })} 
+              className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"/>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+              <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save</button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

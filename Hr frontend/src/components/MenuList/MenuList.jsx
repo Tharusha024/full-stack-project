@@ -29,8 +29,8 @@ function MenuList({ isSelected, setIsSelected }) {
         </Menu.SubMenu>
         <Menu.SubMenu className="font-menu" key="Employees" icon={<UserOutlined />} title="Employees">
         <Menu.Item className="submenuitem" key="Employees" icon={<MinusSquareOutlined />} >Employees</Menu.Item>
-        <Menu.Item className="submenuitem" key="Disciplinary" icon={<MinusSquareOutlined />} >Disciplinary</Menu.Item>
         <Menu.Item className="submenuitem" key="InactiveEmployee" icon={<MinusSquareOutlined />} >Inactive Employee</Menu.Item>
+        <Menu.Item className="submenuitem" key="Disciplinary" icon={<MinusSquareOutlined />} >Disciplinary</Menu.Item>
         </Menu.SubMenu>
         <Menu.Item className="font-menu" key="AttendanceReport" icon={<CalendarOutlined />} >Attendance Report</Menu.Item>
         <Menu.SubMenu className="font-menu" key="Leave" icon={<FileExclamationOutlined />} title="Leave">

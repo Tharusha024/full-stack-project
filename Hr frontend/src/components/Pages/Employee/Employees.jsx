@@ -179,9 +179,11 @@ const Employees = () => {
           <table className="w-full mt-4 border-collapse border border-gray-300 table-auto">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/3">Name</th>
-                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/6">Pin</th>
-                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/3">Email</th>
+                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/4">Name</th>
+                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/12">Pin</th>
+                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/4">Email</th>
+                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/6">Department</th>
+                <th className="border border-black  px-4 py-2 bg-custom-blue w-1/3">Designation</th>
                 <th className="border border-black  px-4 py-2 bg-custom-blue w-1/6">Actions</th>
               </tr>
             </thead>
@@ -191,10 +193,12 @@ const Employees = () => {
                   key={employee.id}
                   className="odd:bg-custom-blue-2 even:bg-custom-blue-3 hover:bg-gray-100"
                 >
-                  <td className="py-2 px-4 border border-black w-1/3">{employee.name}</td>
-                  <td className="py-2 px-4 border border-black w-1/6">{employee.pin}</td>
-                  <td className="py-2 px-4 border border-black w-1/3">{employee.email}</td>
-                  <td className="border-b border-r border-black px-4 py-2 flex items-center justify-center space-x-2">
+                  <td className="py-2 px-4 border border-black w-1/4">{employee.name}</td>
+                  <td className="py-2 px-4 border border-black w-1/12">{employee.pin}</td>
+                  <td className="py-2 px-4 border border-black w-1/4">{employee.email}</td>
+                  <td className="py-2 px-4 border border-black w-1/6">{employee.department}</td>
+                  <td className="py-2 px-4 border border-black w-1/3">{employee.designation}</td>
+                  <td className="py-2 px-4 border border-black w-1/3">
                     <div className="flex space-x-2">
                       <button
                         className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
@@ -277,23 +281,24 @@ const Employees = () => {
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
                 />
-
-                <label className="block text-sm font-medium mb-2">User Type</label>
-                <select
-                  value={editEmployee?.userType || ''} 
+                <label className="block text-sm font-medium mb-2">Department</label>
+                <input
+                  type="text"
+                  value={editEmployee?.department || ''}
                   onChange={(e) =>
-                    setEditEmployee((prev) => ({
-                      ...prev,
-                      userType: e.target.value, // Update the userType
-                    }))
+                    setEditEmployee((prev) => ({ ...prev, department: e.target.value }))
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
-                >
-                  <option value="">Select User Type</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-
+                />
+                <label className="block text-sm font-medium mb-2">Designation</label>
+                <input
+                  type="text"
+                  value={editEmployee?.designation || ''}
+                  onChange={(e) =>
+                    setEditEmployee((prev) => ({ ...prev, designation: e.target.value }))
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4"
+                />
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={() => {
