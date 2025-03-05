@@ -1,138 +1,108 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, message } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { Table, Button, Modal, Form, Input, message } from "antd";
+import { ArrowRightOutlined, FolderOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import SubTopBar from "../../TopBar/SubTopBar";
 
-const { Option } = Select;
-
-const AssetManagement = () => {
-  const [assets, setAssets] = useState([]);
+const AssetCategory = () => {
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState(null);
-  const [form] = Form.useForm();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
-  // Fetch asset data
   useEffect(() => {
-    fetchAssets();
+    fetchCategories();
   }, []);
 
-  const fetchAssets = async () => {
+  const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/assets");
-      setAssets(response.data);
+      const response = await axios.get("http://localhost:8080/api/categories");
+      setCategories(response.data);
     } catch (error) {
-      message.error("Failed to fetch assets.");
-    } finally {
-      setLoading(false);
+      console.error("Error fetching categories", error);
+      message.error("Failed to fetch categories");
     }
+    setLoading(false);
   };
 
-  // Handle Add/Edit Asset
-  const handleSaveAsset = async (values) => {
-    try {
-      if (selectedAsset) {
-        await axios.put(`/api/assets/${selectedAsset._id}`, values);
-        message.success("Asset updated successfully!");
-      } else {
-        await axios.post("/api/assets", values);
-        message.success("Asset added successfully!");
-      }
-      fetchAssets();
-      setIsModalVisible(false);
-      form.resetFields();
-    } catch (error) {
-      message.error("Operation failed.");
-    }
-  };
-
-  // Handle Delete
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/assets/${id}`);
-      message.success("Asset deleted successfully!");
-      fetchAssets();
+      await axios.delete(`http://localhost:8080/api/categories/${id}`);
+      message.success("Category deleted successfully");
+      fetchCategories();
     } catch (error) {
-      message.error("Failed to delete asset.");
+      console.error("Error deleting category", error);
+      message.error("Failed to delete category");
     }
   };
 
-  // Show Modal for Add/Edit
-  const showModal = (asset = null) => {
-    setSelectedAsset(asset);
-    setIsModalVisible(true);
-    form.setFieldsValue(asset || { status: "Available" });
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setIsModalOpen(true);
   };
 
+  const handleAddCategory = () => {
+    setEditingCategory(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (values) => {
+    try {
+      if (editingCategory) {
+        await axios.put(`http://localhost:8080/api/categories/${editingCategory.id}`, values);
+        message.success("Category updated successfully");
+      } else {
+        await axios.post("http://localhost:8080/api/categories", values);
+        message.success("Category added successfully");
+      }
+      setIsModalOpen(false);
+      fetchCategories();
+    } catch (error) {
+      console.error("Error saving category", error);
+      message.error("Failed to save category");
+    }
+  };
+
+  const columns = [
+    { title: "Category Name", dataIndex: "categoryName", key: "categoryName" },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div className="flex space-x-2">
+          <Button onClick={() => handleEdit(record)} type="primary" icon={<EditOutlined />} />
+          <Button onClick={() => handleDelete(record.id)} type="danger" icon={<DeleteOutlined />} />
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="p-6 bg-cyan-200 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Asset Management</h1>
-
-      {/* Add Asset Button */}
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => showModal()}
-        className="mb-4"
-      >
-        Add Asset
+    <div className="absolute left-60 top-16 p-4 m-0 w-full h-full bg-custom-blue-2">
+      <SubTopBar
+        icon={<FolderOutlined />}
+        name="Assets"
+        secondname="Asset Categories"
+        arrow={<ArrowRightOutlined className="size-3" />}
+      />
+      <h2 className="text-2xl font-bold mb-4">Asset Category Management</h2>
+      
+      <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory} className="mb-2">
+        Add Category
       </Button>
+      
+      <Table dataSource={categories} columns={columns} loading={loading} rowKey="id" />
 
-      {/* Assets Table */}
-      <Table dataSource={assets} loading={loading} rowKey="_id" bordered>
-        <Table.Column title="Asset Name" dataIndex="name" />
-        <Table.Column title="Category" dataIndex="category" />
-        <Table.Column title="Status" dataIndex="status" />
-        <Table.Column title="Assigned To" dataIndex="assignedTo" />
-        <Table.Column
-          title="Actions"
-          render={(text, record) => (
-            <div className="flex gap-2">
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => showModal(record)}
-              />
-              <Button
-                type="danger"
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(record._id)}
-              />
-            </div>
-          )}
-        />
-      </Table>
-
-      {/* Modal for Adding/Editing Asset */}
-      <Modal
-        title={selectedAsset ? "Edit Asset" : "Add Asset"}
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={() => form.submit()}
-        okText={selectedAsset ? "Update" : "Create"}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSaveAsset}>
-          <Form.Item name="name" label="Asset Name" rules={[{ required: true }]}>
-            <Input placeholder="Enter asset name" />
+      <Modal title={editingCategory ? "Edit Category" : "Add Category"} visible={isModalOpen} onCancel={() => setIsModalOpen(false)} footer={null}>
+        <Form initialValues={editingCategory} onFinish={handleSave}>
+          <Form.Item name="categoryName" label="Category Name" rules={[{ required: true, message: "Enter category name" }]}>
+            <Input />
           </Form.Item>
-          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-            <Select>
-              <Option value="Electronics">Electronics</Option>
-              <Option value="Furniture">Furniture</Option>
-              <Option value="Software">Software</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="status" label="Status">
-            <Select>
-              <Option value="Available">Available</Option>
-              <Option value="Assigned">Assigned</Option>
-              <Option value="Maintenance">Maintenance</Option>
-              <Option value="Retired">Retired</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="assignedTo" label="Assigned To">
-            <Input placeholder="Enter employee name (if assigned)" />
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              {editingCategory ? "Update" : "Add"} Category
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
@@ -140,4 +110,4 @@ const AssetManagement = () => {
   );
 };
 
-export default AssetManagement;
+export default AssetCategory;
