@@ -66,6 +66,7 @@ const AssetCategory = () => {
 
   const columns = [
     { title: "Category Name", dataIndex: "categoryName", key: "categoryName" },
+    { title: "Description", dataIndex: "description", key: "description" },
     {
       title: "Actions",
       key: "actions",
@@ -87,7 +88,10 @@ const AssetCategory = () => {
         arrow={<ArrowRightOutlined className="size-3" />}
       />
       <h2 className="text-2xl font-bold mb-4">Asset Category Management</h2>
-      
+      <p className="mb-4 text-gray-700">
+        This page allows you to manage asset categories. Each category should have a name and a brief description explaining its purpose.
+      </p>
+
       <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory} className="mb-2">
         Add Category
       </Button>
@@ -98,6 +102,9 @@ const AssetCategory = () => {
         <Form initialValues={editingCategory} onFinish={handleSave}>
           <Form.Item name="categoryName" label="Category Name" rules={[{ required: true, message: "Enter category name" }]}>
             <Input />
+          </Form.Item>
+          <Form.Item name="description" label="Description" rules={[{ required: true, message: "Enter category description" }]}>
+            <Input.TextArea rows={3} placeholder="Provide details about this category" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
